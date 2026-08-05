@@ -1,0 +1,152 @@
+{
+  "name": "week 4 day 4",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -368,
+        -32
+      ],
+      "id": "ec8f542c-22aa-495c-bded-2b95e83b4264",
+      "name": "When chat message received",
+      "webhookId": "e16fe69d-0a5e-4951-b14b-442da6e6879d"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "Role: You are a highly precise Knowledge Base Assistant. Your objective is to answer user queries strictly using the retrieved context from your search tool.\n\nSTRICT GUIDELINES:\n1. Tool Usage: Always use your retrieved search tool to find factual information before answering.\n2. Never Invent: If the retrieved search tool does not return the direct answer to the user's query, or if you are at all unsure, respond exactly with: \"Information not available.\" You are strictly forbidden from guessing, inventing, or assuming any details.\n3. Memory & Context: Reference the chat history (past interactions) to handle follow-up questions. For example, if the user asks a follow-up question using pronouns (e.g., \"how long does it take?\" or \"what are its rules?\"), look at the previous messages in memory to understand what \"it\" refers to before querying your tool.\n4. Citing Sources: Always mention the source or document name where the information was fo"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -80,
+        -128
+      ],
+      "id": "668ba6d7-d445-419c-8d23-9dbe276f76e2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        112
+      ],
+      "id": "911bf210-e98e-4762-9119-20b38b1595bb",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        128,
+        112
+      ],
+      "id": "8b31abb3-4827-4a46-9c45-389c67122757",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "content": "Basic Ai assistant that retrieves data from tool and remember the users context"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        0
+      ],
+      "id": "946d1b3a-7e03-4049-b29b-4b940ec099c6",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "db548200-d204-4ad1-a144-6a7e4fbfba3c",
+      "name": "Wikipedia"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "1d75a441-7799-4b81-ba6e-ed7391a80f1a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "YixCMype5uPT6613",
+  "tags": []
+}

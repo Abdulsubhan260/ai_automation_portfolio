@@ -1,0 +1,127 @@
+{
+  "name": "w1 day 3 assign task",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        -96
+      ],
+      "id": "a94045a5-6828-42a4-a737-417e7966363b",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      name: \"Subhan\",\n      email: \"subhan@gmail.com\",\n      department: \"Engineering\",\n      score: 85\n    }\n  },\n  {\n    json: {\n      name: \"Ubaid Khan\",\n      email: \"ubaid@gmail.com\",\n      department: \"Finance\",\n      score: 72\n    }\n  },\n  {\n    json: {\n      name: \"Ahmed Hassn\",\n      email: \"ahmed@gmail.com\",\n      department: \"IT\",\n      score: 45\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        -96
+      ],
+      "id": "25a2b13c-ba85-4c05-ae77-70640e348309",
+      "name": "dummy data set"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b83f6d4d-9ba2-41af-bcdf-68f2875e811c",
+              "name": "Name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "d384ef33-4940-450e-9b8a-4d5a614985dd",
+              "name": "Email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "acffde90-db74-4227-b52c-0d4083270f1e",
+              "name": "Department",
+              "value": "={{ $json.department }}",
+              "type": "string"
+            },
+            {
+              "id": "3c6e5988-44c4-4f98-b0ef-e5a25d4bb0f2",
+              "name": "Score",
+              "value": "={{ $json.score }}",
+              "type": "number"
+            },
+            {
+              "id": "78d2b7a9-b2b6-4afe-a2c3-b7038417bd0a",
+              "name": "Remarks",
+              "value": "={{ $json.score >= 80 ? 'Excellent' : ($json.score >= 60 ? 'Good' : 'Needs Improvement') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        -96
+      ],
+      "id": "19786fab-b861-4102-aa34-b1dc93e822fc",
+      "name": "Score tester"
+    },
+    {
+      "parameters": {
+        "content": "Masters n8n’s item-array JSON data model and dynamic variable referencing via {{ $json.field }} syntax \nShapes data payloads and classifies student/employee records using inline expressions and ternary operators"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        -160
+      ],
+      "id": "6e4dff9d-7e65-42fb-9f20-50e9f25f5d96",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "dummy data set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dummy data set": {
+      "main": [
+        [
+          {
+            "node": "Score tester",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "317c5e8c-ebc7-46d1-8415-9c091be7c31d",
+  "meta": {
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "yff2LZKCNhpcMMGv",
+  "tags": []
+}

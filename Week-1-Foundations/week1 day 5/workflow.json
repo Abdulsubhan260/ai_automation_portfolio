@@ -1,0 +1,155 @@
+{
+  "name": "w1 day 5",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -384,
+        -176
+      ],
+      "id": "f4231141-06af-4f38-a9d9-f33e13a3cdf3",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "=https://zenquotes.io/api/random",
+        "options": {
+          "response": {
+            "response": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -192,
+        -176
+      ],
+      "id": "2c96b4a7-5dc9-41eb-a506-af13763e03b1",
+      "name": "HTTP Request",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9864af7d-7989-4c83-b960-f90a5a9df433",
+              "name": "message",
+              "value": "=\"{{$json.q}}\"\n\n— {{$json.a}}\n\nHave a productive day! 🚀",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        -176
+      ],
+      "id": "7739f200-b419-4fe7-b8ff-aee8c8e57c54",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fromEmail": "abdulsubhantanoli1@gmail.com",
+        "toEmail": "abdulsubhantanoli1@gmail.com",
+        "subject": "Daily Motivational code",
+        "emailFormat": "text",
+        "text": "={{ $json.message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        -176
+      ],
+      "id": "2e4003ad-0028-47ee-9678-4068e501ba30",
+      "name": "Send an Email",
+      "webhookId": "2dca35e0-290c-4f47-8ab1-e99bc882985a",
+      "credentials": {
+        "smtp": {
+          "id": "b1iR0h9jkya9sITQ",
+          "name": "SMTP account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Connects n8n to Google Sheets and Gmail to execute \"read \n→\n→\n decide \n→\n→\n update \n→\n→\n notify\" pipelines .\nProcesses application spreadsheets, validates data, updates row statuses, and sends dynamic HTML emails"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        -272
+      ],
+      "id": "a03d60fd-13e6-41a8-a313-c2ea81c82f8f",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "2e82be1d-f3a0-423d-aafa-2298cc944a0b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "qaEKr2YlASWi6vYh",
+  "tags": []
+}

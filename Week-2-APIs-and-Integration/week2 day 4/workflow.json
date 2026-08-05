@@ -1,0 +1,237 @@
+{
+  "name": "week 2 day 4",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "form-intake",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -496,
+        -96
+      ],
+      "id": "64d60283-0bce-46ef-a0e8-f5bbeff8fd06",
+      "name": "Webhook",
+      "webhookId": "463d719f-4091-499a-bd49-46db36004bbc"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "23eac240-d919-410e-b38a-e9ffac505f0b",
+              "leftValue": "={{ $json.body.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "ca8a1874-e58c-4b30-a6d6-7584155008a2",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "@",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -272,
+        0
+      ],
+      "id": "3ddd92b7-45c9-49d3-94a6-8b8e50503f62",
+      "name": "validate input"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bb325161-eb73-4ba8-9da4-ac0e4fd19439",
+              "name": "saved_at",
+              "value": "={{ $now }}",
+              "type": "string"
+            },
+            {
+              "id": "17b19f88-1fc8-447c-995f-b2ec9e060c3f",
+              "name": "status",
+              "value": "persisted",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -64,
+        -112
+      ],
+      "id": "91560552-fa13-4211-9245-aef7c2ec330f",
+      "name": "Save to Database (Simulated)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c7c48345-4e7d-4628-95a5-2f352970b6d2",
+              "name": "email_sent_to",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "8b7dd50c-fef8-4184-b941-8f6d38d80e82",
+              "name": "email_status",
+              "value": "delivered",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        144,
+        -112
+      ],
+      "id": "5bd0a771-90f5-4241-8e27-0b4b168c6383",
+      "name": "Send Confirmation (Simulated)"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"success\",\n  \"message\": \"Form submission received and processed.\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        320,
+        -112
+      ],
+      "id": "18045327-7cf2-4a65-a16a-1479145d7097",
+      "name": "Respond Success"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"error\",\n  \"message\": \"Validation failed. 'name' is required, and 'email' must contain a valid email address.\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -64,
+        96
+      ],
+      "id": "45eb417d-380a-4891-8f6d-c4b6a128f9d3",
+      "name": "Respond Validation Error"
+    },
+    {
+      "parameters": {
+        "content": "we have to run it in postman desktop app we have to click execute workflow and the go to post man and send request then it will receive data"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        256,
+        160
+      ],
+      "id": "f8b669fa-ddb0-4588-bdf1-20e737dd077b",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "validate input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validate input": {
+      "main": [
+        [
+          {
+            "node": "Save to Database (Simulated)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Validation Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Database (Simulated)": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation (Simulated)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Confirmation (Simulated)": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "2915e7c3-52be-443f-b920-b33155722bf1",
+  "meta": {
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "vPkVLA0X3WOr661k",
+  "tags": []
+}

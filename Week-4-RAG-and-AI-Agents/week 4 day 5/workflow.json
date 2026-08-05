@@ -1,0 +1,254 @@
+{
+  "name": "week 4 day 5",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -432,
+        -128
+      ],
+      "id": "538fea31-88e6-4560-898c-21141e760cae",
+      "name": "When chat message received",
+      "webhookId": "e16fe69d-0a5e-4951-b14b-442da6e6879d"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "You are a highly capable Multi-Tool Assistant equipped to find general information, fetch motivational quotes, and log data.\n\nTOOL USAGE RULE:\nWhenever you use a tool to fetch data (like a quote), you MUST explicitly type out the exact quote and the author in your final reply to the user. Do not just summarize your feelings about it.\n\nSENSITIVE ACTION BOUNDARY:\nWriting or logging data to Google Sheets is a highly sensitive action. You are STRICTLY FORBIDDEN from executing the Google Sheets tool autonomously. \nIf the user asks you to log or save something, you must:\n1. Stop and ask the user for explicit confirmation (e.g., \"Would you like me to proceed with logging this to the Google Sheet? Please reply with 'Yes' to confirm.\").\n2. Do NOT run the tool on that turn.\n3. ONLY execute the Google Sheets tool on the next turn if the user replies with \"Yes\" or gives explicit written permission.\n\nTone: Professional, inspiring, and helpful."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -16,
+        -128
+      ],
+      "id": "c706d4b8-6abd-4667-a7bf-655702b4ea29",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        112
+      ],
+      "id": "958176dc-1201-45bc-9268-b3032ccd53e8",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -80,
+        112
+      ],
+      "id": "08f5f3cc-e69a-4a3d-bc60-3193ea91bb70",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "typeVersion": 1,
+      "position": [
+        64,
+        112
+      ],
+      "id": "5d666b41-1f60-4536-a025-5e15498de79d",
+      "name": "Wikipedia"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool ONLY when the user asks for a motivational quote, a random quote, or some inspiration.",
+        "url": "=https://dummyjson.com/quotes/random",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        192,
+        112
+      ],
+      "id": "dba98532-e959-4480-8b00-1aa15b84e46b",
+      "name": "fetch_random_quote"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool ONLY to append new log entries or save notes. CRITICAL: This is considered a sensitive action. Do NOT execute this tool unless the user has explicitly typed 'Yes' in the chat to confirm the action.",
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1maL_35Udypyt6JzLPKOKfxO9ImUnBnayI0VpomqYUZg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1maL_35Udypyt6JzLPKOKfxO9ImUnBnayI0VpomqYUZg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.row.Date }}",
+            "Logs": "={{ $json.row.Logs }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Logs",
+              "displayName": "Logs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        320,
+        112
+      ],
+      "id": "7634d0eb-d53d-4c35-9557-2a9f48f23536",
+      "name": "Append row in sheet in Google Sheets",
+      "credentials": {
+        "googleApi": {
+          "id": "rCBqhPLujFBPRsMu",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Extends AI Agents with multiple specialized tools (Web Search, APIs, Data Stores) and system boundaries .\nCombines Wikipedia, random quotes HTTP API, and Google Sheets tools while enforcing human approval for sensitive writes"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -672,
+        16
+      ],
+      "id": "b162adc1-d200-4846-9d31-c7608130bfa9",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "fetch_random_quote": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "d492bf10-1333-4616-9b69-a4c1f9172a3a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "d1s0bC9ID5vEdu6w",
+  "tags": []
+}

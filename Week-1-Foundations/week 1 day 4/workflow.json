@@ -1,0 +1,371 @@
+{
+  "name": "w1 day4",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        32
+      ],
+      "id": "e25bd803-541c-448f-b8e7-2a600eb80cf6",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: { name: \"Ali\", score: 92 } },\n  { json: { name: \"Ahmed\", score: 75 } },\n  { json: { name: \"Subhan\", score: 58 } },\n  { json: { name: \"ubaid\", score: 81 } },\n  { json: { name: \"Asbah\", score: 63 } },\n  { json: { name: \"waleed\", score: 42 } },\n  { json: { name: \"Afaaq\", score: 88 } },\n  { json: { name: \"umar\", score: 70 } },\n  { json: { name: \"uzair\", score: 50 } },\n  { json: { name: \"ayesha\", score: 67 } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -624,
+        32
+      ],
+      "id": "a4defb6a-70f9-47a0-bd31-3cbe2a33dd6f",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.score }}",
+                    "rightValue": 85,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    },
+                    "id": "2ff0e275-36a4-443e-930b-735d7d71b1c5"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "excellent"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ab2b82f9-d155-4f69-916e-797fa79609c3",
+                    "leftValue": "={{ $json.score }}",
+                    "rightValue": 74,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Good "
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "17368606-7555-4287-ad9b-ca8c8ebcd75e",
+                    "leftValue": "={{ $json.score }}",
+                    "rightValue": 64,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Fair"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "3c16c548-3261-490d-b9c5-2b4c9ac683f2",
+                    "leftValue": "={{ $json.score }}",
+                    "rightValue": 50,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Need hard work"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "026efb4e-ecd0-439c-a046-5d066229e341",
+                    "leftValue": "={{ $json.score }}",
+                    "rightValue": 50,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -416,
+        -16
+      ],
+      "id": "c993d916-d86a-460b-9ade-5679d7aa321e",
+      "name": "Route by score"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ddcb221-8881-459a-9c6a-d20cc9287952",
+              "name": "Message",
+              "value": "=Congratulations!!! You are Exceptional  {{ $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -48,
+        -208
+      ],
+      "id": "3326890b-2346-4aa8-9cb9-22611b46292b",
+      "name": "Excellent Group"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ddcb221-8881-459a-9c6a-d20cc9287952",
+              "name": "Message",
+              "value": "=Congratulations!!! You have good result  {{ $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        -112
+      ],
+      "id": "ef8fe462-b0ca-49b3-91ff-cd6bdf2717b6",
+      "name": "Good Group"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ddcb221-8881-459a-9c6a-d20cc9287952",
+              "name": "Message",
+              "value": "=Congratulations!!! You have Fair result  {{ $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        48
+      ],
+      "id": "a7e63d95-561d-41b6-bf41-f88eada7ae0f",
+      "name": "Fair Group"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ddcb221-8881-459a-9c6a-d20cc9287952",
+              "name": "Message",
+              "value": "= You have to work hard for next time  {{ $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        192,
+        192
+      ],
+      "id": "bdfaaf01-d124-4bec-ba9c-c86240f00848",
+      "name": "Need Hardwork"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ddcb221-8881-459a-9c6a-d20cc9287952",
+              "name": "Message",
+              "value": "= you are fail!!! Better luck next time  {{ $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        256
+      ],
+      "id": "60609fa4-0296-4ada-acb0-203a7a781a12",
+      "name": "fail group"
+    },
+    {
+      "parameters": {
+        "content": "Controls workflow execution paths using IF, Switch, Filter, Merge, and batch looping nodes .\nConstructs multi-branch routing logic to categorize incoming records and attach conditional metadata "
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1088,
+        -192
+      ],
+      "id": "a71ccc74-c2c1-47b6-a510-ea77041252ed",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Route by score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by score": {
+      "main": [
+        [
+          {
+            "node": "Excellent Group",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Good Group",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fair Group",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Need Hardwork",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "fail group",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "b2f6c96b-2088-4251-8137-406e5924425f",
+  "meta": {
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "QsWa7THeycUJEzOt",
+  "tags": []
+}

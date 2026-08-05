@@ -1,0 +1,184 @@
+{
+  "name": "week 4 day 6(chatbot)",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -480,
+        48
+      ],
+      "id": "db3f194e-192f-4f0a-917a-823c11da330a",
+      "name": "When chat message received",
+      "webhookId": "5e40267a-e3bb-416a-8a80-5f038c97284e"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are the official Company Knowledge Assistant. Your job is to answer employee questions strictly using the provided knowledge base tool.\n\nCRITICAL INSTRUCTIONS:\n1. ALWAYS use your Pinecone Vector Store tool to search for the answer first.\n2. If the answer cannot be found in the retrieved context, respond exactly with: \"Information not available.\" Do NOT guess or invent policies.\n3. Always cite your source if possible (e.g., \"[Source: Leave Policy]\").\n4. Be polite, professional, and concise."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -240,
+        32
+      ],
+      "id": "708541da-85aa-4135-9f2c-5bd20f6007b8",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        256
+      ],
+      "id": "d9126e59-aea9-4e20-9a5e-29337ad5d60f",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -240,
+        240
+      ],
+      "id": "dd3dad26-bca1-4f07-a71b-9c851aefe8d3",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Use this tool to search the official company knowledge base for HR policies, IT rules, work hours, internships, and code of conduct.",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "company-knowledge",
+          "mode": "list",
+          "cachedResultName": "company-knowledge"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        64,
+        176
+      ],
+      "id": "578f2a7e-65c6-4d28-a036-be1ba3da8787",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "m0G3KZLrmykhtNqS",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "sentence-transformers/all-MiniLM-L6-v2",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsHuggingFaceInference",
+      "typeVersion": 1,
+      "position": [
+        256,
+        288
+      ],
+      "id": "e69eac19-1026-4fee-827c-a14a0cf89c5d",
+      "name": "Embeddings HuggingFace Inference",
+      "credentials": {
+        "huggingFaceApi": {
+          "id": "09th7Ll2hIc6zINa",
+          "name": "Hugging Face account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings HuggingFace Inference": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "3e513ac5-e866-4a97-8688-4fb817c83cd8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "BMZj9M9BMMpP7fcv",
+  "tags": []
+}

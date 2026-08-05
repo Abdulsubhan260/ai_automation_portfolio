@@ -1,0 +1,180 @@
+{
+  "name": "week5 day3",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "secured-intake",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -272,
+        -16
+      ],
+      "id": "c7ec97db-e23d-499c-8fa9-f25a184ad1d0",
+      "name": "Webhook",
+      "webhookId": "67772a2b-50f5-4ec9-a4b6-736dbe21c97d"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "08a0c2aa-ddbb-4bb7-89f0-e0c729e59626",
+              "leftValue": "={{ $json.headers['x-secret-token'] }}",
+              "rightValue": "SuperSecretKey123!",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -64,
+        -16
+      ],
+      "id": "e292325d-ac65-4661-816a-6bfe637cc817",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6e20dfb5-1ba5-414f-bf20-824a2b6430b9",
+              "name": "access_status",
+              "value": "GRANTED",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        144,
+        -112
+      ],
+      "id": "80e90b32-969c-4dc1-9610-163c609d66da",
+      "name": "Process Authorized Request"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"success\",\n  \"message\": \"Access Granted: Valid security header received.\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        352,
+        -112
+      ],
+      "id": "1a22b8b7-10dd-49f6-8e07-f4146c17cee3",
+      "name": "Respond 200 Authorized"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"error\",\n  \"message\": \"HTTP 401 Unauthorized: Invalid or missing 'x-secret-token' header.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        144,
+        80
+      ],
+      "id": "90852904-5a23-42ce-a140-ae40266e1071",
+      "name": "Respond 401 Unauthorized"
+    },
+    {
+      "parameters": {
+        "content": "Protects API credentials, isolates secrets from code, masks PII, and secures public webhook endpoints .\nImplements custom x-secret-token header verification to block unauthorized HTTP requests with 401 codes"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        -160
+      ],
+      "id": "44f77e7d-308b-4cde-8556-13ae005182e4",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Process Authorized Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond 401 Unauthorized",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Authorized Request": {
+      "main": [
+        [
+          {
+            "node": "Respond 200 Authorized",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "2ec9c8ff-1eb7-4b30-ac39-7337d2792ea2",
+  "meta": {
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "Yb8TTnhoL2ZRSfWu",
+  "tags": []
+}

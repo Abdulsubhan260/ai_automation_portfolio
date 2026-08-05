@@ -1,0 +1,234 @@
+{
+  "name": "week5 day4",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1008,
+        -16
+      ],
+      "id": "bf534702-38ad-459a-bad6-7900a2009f0b",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5f32f342-b226-4488-a2b3-436815f3e2a2",
+              "name": "customer_name",
+              "value": "Zainab Ahmed",
+              "type": "string"
+            },
+            {
+              "id": "6ee8c4b1-adf4-46c4-8198-d3da61d18adc",
+              "name": "refund_amount",
+              "value": "2000 Pkr",
+              "type": "string"
+            },
+            {
+              "id": "dfc1f25d-92e0-43ce-b652-88d26844d625",
+              "name": "ai_reason",
+              "value": "received broken package",
+              "type": "string"
+            },
+            {
+              "id": "efe4a444-653b-4869-97bf-12d206ca4ad3",
+              "name": "ai_recommendation",
+              "value": "Approve full refund",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -816,
+        -16
+      ],
+      "id": "a22ed4c9-0c1a-4cfb-a06d-541356073048",
+      "name": "AI Refund Recommendation"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "options": {
+          "webhookSuffix": "approval-check"
+        }
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -656,
+        -16
+      ],
+      "id": "2d5b5127-8374-41c8-b90a-1090e64fc234",
+      "name": "Wait",
+      "webhookId": "7374767d-2f09-4545-bebc-6d08fa95bab0"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9f64d32e-208c-49ec-9a4a-d4bdc24a508d",
+              "leftValue": "={{ $json.query.action }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -480,
+        -16
+      ],
+      "id": "7aa603ba-2af9-4053-b003-3f1783364ccc",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ae084e10-9c2f-46e4-ae8e-1b791eecdc5c",
+              "name": "refund_status",
+              "value": "PROCESSED SUCCESSFULLY",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -240,
+        -112
+      ],
+      "id": "b472004e-c38c-4843-a256-f92c20df16f0",
+      "name": "process refund approved"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6cb6972c-ffce-4a08-a3d6-9ae6023647c1",
+              "name": "refund_status",
+              "value": "CANCEL BY HUMAN AGENT",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -240,
+        96
+      ],
+      "id": "fd63b198-91df-4a5e-a558-d0a49fb3fc53",
+      "name": "cancel Refund(rejected)"
+    },
+    {
+      "parameters": {
+        "content": "Inserts human approval circuit breakers before AI models execute sensitive financial or operational actions .\nUses the Wait Node to pause workflows, generate unique resume URLs, and wait for human \"Approve/Reject\""
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1248,
+        -160
+      ],
+      "id": "5e0422be-a597-4a76-a555-790f315dd1a4",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "AI Refund Recommendation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Refund Recommendation": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "process refund approved",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "cancel Refund(rejected)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "af478c8a-2d11-4150-b8ef-d649016b7042",
+  "meta": {
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "koaG2RgfVLUeP9OO",
+  "tags": []
+}

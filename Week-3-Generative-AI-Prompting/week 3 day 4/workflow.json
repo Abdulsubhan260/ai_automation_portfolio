@@ -1,0 +1,357 @@
+{
+  "name": "week3 day 4",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        -64
+      ],
+      "id": "e2fd2246-2ee8-4d53-b458-42fa6a468bdb",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      sender: \"abc.user@domain.com\",\n      subject: \"just a quick thing\",\n      body: \"Hey there! Just checking in. I was thinking about maybe asking a question about my billing later, but actually, nevermind, it's fine. Just wanted to say hi! Or maybe I do need help? No, forget it. Have a good day!\"\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -352,
+        80
+      ],
+      "id": "e16ff0ca-c65a-4247-b498-4630649a6619",
+      "name": "confusing input"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following incoming email and extract the requested fields.\n\nEmail Body:\n{{ $json.body }}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -160,
+        -96
+      ],
+      "id": "fbc33c3e-371c-4dce-8bf7-ff7727655e36",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        64
+      ],
+      "id": "8fb792ab-e5b4-4f2a-8a80-98683d0a0a14",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"category\": \"Support\",\n  \"priority\": \"Low\",\n  \"sentiment\": \"Neutral\",\n  \"department\": \"Admin\",\n  \"summary\": \"A short one sentence summary of the email content.\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -64,
+        80
+      ],
+      "id": "30794099-5a9f-4db7-b7fd-40e38c8dcd9b",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "67c33db1-17c2-410d-a555-2ed6932ab8fb",
+              "leftValue": "={{ $json.category }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "f5769b9a-29d0-4a2c-8f0a-c27dffb1b43a",
+              "leftValue": "={{ $json.priority }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        192,
+        -96
+      ],
+      "id": "856a3e6a-fc80-45d0-9eb8-6735dedc2f56",
+      "name": "validate output"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d01ed9c2-8b45-4705-a7a7-b3f8fad81cda",
+              "name": "category",
+              "value": "={{ $json.category }}",
+              "type": "string"
+            },
+            {
+              "id": "4eea1ff7-1ac5-4b74-9491-0750f1c588f9",
+              "name": "priority",
+              "value": "={{ $json.priority }}",
+              "type": "string"
+            },
+            {
+              "id": "45a8cea7-12de-41c7-b9a7-a8a1fd000afe",
+              "name": "sentiment",
+              "value": "={{ $json.sentiment }}",
+              "type": "string"
+            },
+            {
+              "id": "ae2d7864-16b0-4ee4-bb67-a3c06f083169",
+              "name": "department",
+              "value": "={{ $json.department }}",
+              "type": "string"
+            },
+            {
+              "id": "075cf5a6-fd94-46ed-9384-2b34b3333d36",
+              "name": "summary",
+              "value": "={{ $json.summary }}",
+              "type": "string"
+            },
+            {
+              "id": "a3572241-0b25-46cc-8d3a-4cce66738efc",
+              "name": "validation_status",
+              "value": "passed",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        -96
+      ],
+      "id": "b19e244d-3a34-45ea-a7c7-65a97db79f24",
+      "name": "Process Enriched Data"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        160,
+        208
+      ],
+      "id": "2d3eeb19-8c56-48b7-b2ba-328117330d97",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ffd87edc-472a-4f3b-944d-b75d541a0be9",
+              "name": "category ",
+              "value": "General",
+              "type": "string"
+            },
+            {
+              "id": "e80e5c30-f06f-4853-a410-4388dc259bc7",
+              "name": "priority",
+              "value": "Low",
+              "type": "string"
+            },
+            {
+              "id": "fac5317a-544f-4176-89ba-21f99c9d22f0",
+              "name": "sentiment",
+              "value": "Neutral",
+              "type": "string"
+            },
+            {
+              "id": "78e0aec6-cf85-4599-943d-141e2b1c1206",
+              "name": "department",
+              "value": "Admin",
+              "type": "string"
+            },
+            {
+              "id": "f466e59a-e830-4386-aed4-9d8367eefab9",
+              "name": "summary",
+              "value": " Fallback triggered: Vague or unparseable input",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        128
+      ],
+      "id": "861c1134-f159-439b-ab08-434c5bce277c",
+      "name": "Fallback way"
+    },
+    {
+      "parameters": {
+        "content": "This workflow acts as an intelligent, error-safe email processor. It automatically takes an incoming email and uses AI to analyze it, extracting five key details (category, priority, sentiment, department, and summary) into a highly structured format. To prevent errors, the system checks whether the AI successfully populated these critical fields. If the email is too confusing or vague for the AI to understand, a safety fallback branch triggers automatically. This fallback assigns safe, standard default values, ensuring the automation continues running smoothly without crashing your system."
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        -160
+      ],
+      "id": "bbf0a4e5-2cf2-4802-8163-2915398ea66d",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "confusing input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "confusing input": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "validate output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validate output": {
+      "main": [
+        [
+          {
+            "node": "Process Enriched Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fallback way",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "1cc3cb2d-478b-409d-a00b-399f61583ba2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "6FCgtVhFa9p6g4BM",
+  "tags": []
+}

@@ -1,0 +1,288 @@
+{
+  "name": "week 4 day 3",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -1536,
+        -432
+      ],
+      "id": "c874ca9d-fdde-4943-88a7-1e609be884b9",
+      "name": "When chat message received",
+      "webhookId": "54a7656b-e20a-483e-ab3b-e7b42145fce5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "You are an HR Policy Assistant for our company. Your job is to answer employee questions strictly using the provided knowledge base.\n\nCRITICAL INSTRUCTIONS:\n1. If the answer to the question cannot be found in the retrieved context, respond with exactly: \"Information not available.\" Do NOT invent or assume any policies.\n2. Always cite your source if possible (e.g., \"[Source: Leave Policy]\").\n3. Be polite, professional, and concise.t"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1328,
+        -432
+      ],
+      "id": "040c610e-8a0d-4a95-8461-255f4e4686ff",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -1440,
+        -224
+      ],
+      "id": "566a32f5-df1f-48de-ac21-cd1010aa1349",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -1184,
+        -176
+      ],
+      "id": "ca4e3851-86ee-4527-bec3-084742f2a59f",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Use this tool to retrieve official company HR policies, including leave policy, working hours, attendance guidelines, internship guidelines, and the code of conduct.",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        -1056,
+        -240
+      ],
+      "id": "3d894b15-7936-4bd4-8f68-1f8eb0c65796",
+      "name": "Simple Vector Store"
+    },
+    {
+      "parameters": {
+        "modelName": "sentence-transformers/all-MiniLM-L6-v2",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsHuggingFaceInference",
+      "typeVersion": 1,
+      "position": [
+        -1120,
+        0
+      ],
+      "id": "89da16b4-c15a-4aaa-9cb8-c9de1b7e7a73",
+      "name": "Embeddings HuggingFace Inference",
+      "credentials": {
+        "huggingFaceApi": {
+          "id": "09th7Ll2hIc6zINa",
+          "name": "Hugging Face account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        -16
+      ],
+      "id": "d16497f2-2ce6-4965-abe3-5710e7465128",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        -224
+      ],
+      "id": "55e5509f-090a-4dd6-8e40-422833eb4d25",
+      "name": "Simple Vector Store1"
+    },
+    {
+      "parameters": {
+        "modelName": "sentence-transformers/all-MiniLM-L6-v2",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsHuggingFaceInference",
+      "typeVersion": 1,
+      "position": [
+        48,
+        48
+      ],
+      "id": "5ba3e57f-a250-4bc7-b8eb-feb39146de06",
+      "name": "Embeddings HuggingFace Inference1",
+      "credentials": {
+        "huggingFaceApi": {
+          "id": "09th7Ll2hIc6zINa",
+          "name": "Hugging Face account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "[Source: Leave Policy]\nEmployees are allowed exactly 10 casual leaves and 15 sick leaves per calendar year. Casual leaves require a 2-day prior notice.\n\n[Source: Working Hours]\nOfficial working hours are from 9:00 AM to 6:00 PM, Monday to Friday. There is a mandatory 1-hour lunch break between 1:00 PM and 2:00 PM.\n\n[Source: Attendance Guidelines]\nDaily attendance must be marked before 9:30 AM via the office portal. Late arrivals more than 3 times a month will result in a half-day pay cut.\n\n[Source: Internship Guidelines]\nInternships run for a duration of 6 weeks. Interns are entitled to 2 casual leaves during their internship tenure.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        304,
+        -16
+      ],
+      "id": "ffa67704-b1bc-4562-b320-eec18f6111eb",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "content": "This system works as an AI-powered HR Assistant that answers employee questions accurately by searching a local database instead of guessing [Page 19]. We built it by creating two parallel branches on the same canvas: an ingestion branch and a chatbot branch [Page 18]. The ingestion branch uses a manual trigger and data loader to save custom company policies into a local in-memory vector database using Gemini Embeddings . The chatbot branch connects a chat interface to an AI Agent driven by Llama 3, which accesses those stored policies using a retrieval tool while simple memory tracks the conversation . If a question is outside the loaded documents, the agent is strictly forbidden from inventing policies, safely refusing to answer to prevent hallucinations "
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        480,
+        0
+      ],
+      "id": "b67b0475-3dea-42b3-b74b-b4d1761f7e21",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings HuggingFace Inference": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Simple Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings HuggingFace Inference1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simple Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Simple Vector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "44cc3838-a4ab-4c2a-afdf-364fa62b4603",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "6ePjYBUo0Hwg6SNR",
+  "tags": []
+}

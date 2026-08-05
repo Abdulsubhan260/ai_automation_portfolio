@@ -1,0 +1,182 @@
+{
+  "name": "week 5 day2",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        -48
+      ],
+      "id": "bb42b555-5621-4521-8d11-d29f1be30d33",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://httpbin.org/status/500",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -368,
+        -48
+      ],
+      "id": "2d7c5fc2-77d3-4689-9967-432510ecc063",
+      "name": "api Request(with retry)",
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "60512922-289a-4217-93ea-36c4aa793741",
+              "name": "execution_status",
+              "value": "Success",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        0,
+        -144
+      ],
+      "id": "b491681e-8b96-40dc-b383-562a2f260bd9",
+      "name": "Process API Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a9b86e7a-f169-46ee-af6a-5eba568cbebe",
+              "name": "error_type",
+              "value": "API_FAILURE",
+              "type": "string"
+            },
+            {
+              "id": "a8ba2630-6b45-400c-b23a-3847d3c08b7e",
+              "name": "logged_at",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -160,
+        48
+      ],
+      "id": "6e351554-1092-42b5-bac6-a2cb188874b6",
+      "name": "log error"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "125bad35-d99b-4edc-bd4d-6dc042c2e4ff",
+              "name": "alert_recipent",
+              "value": "admin@company.com",
+              "type": "string"
+            },
+            {
+              "id": "f9bd6ce9-949d-4e1f-8bf1-491f55ac78a5",
+              "name": "alert_message",
+              "value": "=[ALERT] HTTP API Request failed after retries. Logged at {{ $json.logged_at }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        48,
+        48
+      ],
+      "id": "c34e9f1c-7d37-4142-b4ad-681496c54f88",
+      "name": "notify admin"
+    },
+    {
+      "parameters": {
+        "content": "Implements production-grade error handling, retries, try-catch routing, and Error Trigger workflows .\nConfigures node retries and error output branching to log API failures and notify admins without crashing"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -928,
+        -192
+      ],
+      "id": "868e4611-842b-49d4-b1d8-48a4b2a7cde0",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "api Request(with retry)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "api Request(with retry)": {
+      "main": [
+        [
+          {
+            "node": "Process API Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "log error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "log error": {
+      "main": [
+        [
+          {
+            "node": "notify admin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "016faea6-3eb3-4526-91b9-bb962e431fd3",
+  "meta": {
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "7kU7LpshmvIu9MoD",
+  "tags": []
+}

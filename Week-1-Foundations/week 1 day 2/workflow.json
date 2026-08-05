@@ -1,0 +1,108 @@
+{
+  "name": "week 1 day 2",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -256,
+        0
+      ],
+      "id": "24254306-9185-4b4d-88d4-cb901c805807",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0d0f94b0-4a15-4601-9128-268a333377a4",
+              "name": "Email",
+              "value": "Submit your tasks of n8n automation",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "e072c1f0-40ae-40a9-a03f-b2f41ef6b618",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fromEmail": "abdulsubhantanoli1@gmail.com",
+        "toEmail": "abdulsubhantanoli1@gmail.com",
+        "subject": "abdulsubhantanoli1@gmail.com",
+        "emailFormat": "text",
+        "text": "={{ $json.Email }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        192,
+        0
+      ],
+      "id": "12cad5f1-85b4-4db5-b59c-98d6c6e59042",
+      "name": "Send an Email",
+      "webhookId": "0843b2b8-ec17-4a8a-884a-d366ccf4a5ec",
+      "credentials": {
+        "smtp": {
+          "id": "7ybL9np508WgSpeR",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c276ce7e-b414-4c33-82af-2bc8859876e0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "97HgLRkCt4dTR3U5",
+  "tags": []
+}

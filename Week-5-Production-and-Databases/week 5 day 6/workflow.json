@@ -1,0 +1,464 @@
+{
+  "name": "week 5 day 6",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -912,
+        -80
+      ],
+      "id": "17c07bba-96c3-462a-b5c9-ea012b721684",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      applicant_name: \"Fatima Khan\",\n      email: \"fatima@example.com\",\n      resume_text: \"I am a software engineer with 4 years of experience in Node.js, Python, and n8n workflow automation. I have built multiple API integrations and led a team of 3 developers. I am looking for a senior automation role.\"\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -656,
+        -80
+      ],
+      "id": "79332ccf-225c-4ac9-beac-821c30e2a63e",
+      "name": "New Application Intake"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {
+          "maxTokensToSample": 4096
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        112
+      ],
+      "id": "af525e60-7a73-48bc-8cbf-73a77654abc5",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"candidate\": \"Fatima Khan\",\n  \"skills\": [\"Node.js\", \"Python\", \"n8n\", \"API Integration\"],\n  \"score\": 85,\n  \"recommendation\": \"Shortlist\",\n  \"reason\": \"Highly qualified with 4 years of experience, direct team leadership, and expertise in automation platforms like n8n.\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -352,
+        64
+      ],
+      "id": "2e4368e9-f82e-485d-bb6a-27f4ca3e3140",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "responseMode": "responseNode",
+        "options": {
+          "webhookSuffix": "recruiter-decision"
+        }
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -96,
+        -80
+      ],
+      "id": "e6014a0c-955b-4d30-8bd2-21c345fb6ab3",
+      "name": "Wait for Recruiter Review",
+      "webhookId": "8472623c-ec01-4b60-b558-e81591b212b7"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "352ccf43-fe51-44de-8f95-3b0ea9e2832f",
+              "leftValue": "={{ $json.query.decision }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        112,
+        -80
+      ],
+      "id": "a7184548-2364-42e2-8bad-e5e18a789023",
+      "name": "Check Recruiter Decision"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1b5de93c-aef6-448b-8208-e981c7855e4a",
+              "name": "database_status",
+              "value": "Shortlisted - Technical Interview Scheduled",
+              "type": "string"
+            },
+            {
+              "id": "70b36427-e844-42dd-82e0-f028ae555076",
+              "name": "extracted_score",
+              "value": "={{ $('AI Screening & Scoring').item.json.output.score }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        304,
+        -160
+      ],
+      "id": "7ccf71cf-7831-4bcd-a79f-6d3293d476eb",
+      "name": "Update DB (Shortlisted)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4b047e86-a040-4db0-acdb-df9a8094998a",
+              "name": "email_to",
+              "value": "={{ $('New Application Intake').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "e78ea92d-0d28-412e-8f62-1c6dcb35f09a",
+              "name": "subject",
+              "value": "Interview Invitation - Petalnex AI Automation Role",
+              "type": "string"
+            },
+            {
+              "id": "16154a04-7d3c-44e6-b249-f8889baa149b",
+              "name": "email_body",
+              "value": "=Dear {{ $('AI Screening & Scoring').item.json.output.candidate }}, congratulations! You have been shortlisted for our senior automation role with an AI assessment score of {{ $('AI Screening & Scoring').item.json.output.score }}/100. Let's schedule an interview.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        528,
+        -160
+      ],
+      "id": "89601a01-f4af-477d-a918-c50208efc3ec",
+      "name": "Send Invitation Email"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1e9cbb64-62f1-4f3d-9d42-712feb622539",
+              "name": "database_status",
+              "value": "Rejected - Application Archived",
+              "type": "string"
+            },
+            {
+              "id": "ddaaf7d9-553f-407c-ae68-99dcff7223ca",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        320,
+        16
+      ],
+      "id": "041354fc-64d8-4283-8bf9-d0d94b2fb698",
+      "name": "Update DB (Rejected)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1d5889c-9c57-4e47-bde8-f85264578f22",
+              "name": "email_to",
+              "value": "={{ $('New Application Intake').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "334c2f85-2cb8-4fd4-b1b4-aa63d18b2724",
+              "name": "subject",
+              "value": "Application Status - Petalnex",
+              "type": "string"
+            },
+            {
+              "id": "0c0e431d-0d12-4585-b35c-936fb094c7f7",
+              "name": "email_body",
+              "value": "=Dear {{ $('AI Screening & Scoring').item.json.output.candidate }}, thank you for your interest in the automation role. Unfortunately, we are moving forward with other candidates at this time.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        544,
+        16
+      ],
+      "id": "cfa420e5-7d09-4e07-8681-0884cd47a602",
+      "name": "Send Rejection Email"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following candidate application. Extract their name, key skills, calculate an automated score from 0-100 based on their experience and skills, provide a shortlist/reject recommendation, and write a brief reason.\n\nCandidate Name: {{ $json.applicant_name }}\nEmail: {{ $json.email }}\nResume/Cover Letter:\n{{ $json.resume_text }}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -432,
+        -80
+      ],
+      "id": "cdb0738b-0284-4b7d-a4a3-27825eadf15c",
+      "name": "AI Screening & Scoring"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        272
+      ],
+      "id": "924338a4-2ba8-42c0-bc12-46161b35db28",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "abdulsubhantanoli1@gmail.com",
+        "toEmail": "abdulsubhantanoli1@gmail.com",
+        "subject": "Conratulations",
+        "emailFormat": "text",
+        "text": "={{ $json.subject }}\n\n{{ $json.email_body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        752,
+        -160
+      ],
+      "id": "9accb040-f601-4cf8-9c25-6f190429eedf",
+      "name": "Send an Email",
+      "webhookId": "bd97e58d-6e48-4c17-b27e-066acd0a064e",
+      "credentials": {
+        "smtp": {
+          "id": "b1iR0h9jkya9sITQ",
+          "name": "SMTP account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "http://localhost:5678/webhook-waiting/1674/recruiter-decision?signature=4d14a99cd9a66fa7a9ab013656b29d4e90d03cb70bc57c0e44a0a927980c86e1&decision=approve"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        240
+      ],
+      "id": "4af70694-6adc-47ea-a980-d2ccbf4f9ccc",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "New Application Intake",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Application Intake": {
+      "main": [
+        [
+          {
+            "node": "AI Screening & Scoring",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Screening & Scoring",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Screening & Scoring",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Recruiter Review": {
+      "main": [
+        [
+          {
+            "node": "Check Recruiter Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Recruiter Decision": {
+      "main": [
+        [
+          {
+            "node": "Update DB (Shortlisted)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update DB (Rejected)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update DB (Shortlisted)": {
+      "main": [
+        [
+          {
+            "node": "Send Invitation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update DB (Rejected)": {
+      "main": [
+        [
+          {
+            "node": "Send Rejection Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Screening & Scoring": {
+      "main": [
+        [
+          {
+            "node": "Wait for Recruiter Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Invitation Email": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "6c648644-d690-444b-9719-640ffece82da",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "biYKCMcDhj7If2qR",
+  "tags": []
+}

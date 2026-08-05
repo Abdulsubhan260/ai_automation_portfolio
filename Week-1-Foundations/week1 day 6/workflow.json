@@ -1,0 +1,282 @@
+{
+  "name": "week1 day6",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        0
+      ],
+      "id": "54c2ff55-ced0-4b36-9a4b-e80a600dce34",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      candidate_id: 101,\n      name: \"Amina Malik\",\n      email: \"amina@example.com\",\n      degree: \"BS Computer Science\",\n      skills: \"Python, SQL, n8n, Automation\",\n      experience_years: 3,\n      availability: \"Immediate\"\n    }\n  },\n  {\n    json: {\n      candidate_id: 102,\n      name: \"Bilal Hassan\",\n      email: \"bilal@example.com\",\n      degree: \"BS Business Administration\",\n      skills: \"Excel, Marketing, Basic n8n\",\n      experience_years: 1,\n      availability: \"2 Weeks\"\n    }\n  },\n  {\n    json: {\n      candidate_id: 103,\n      name: \"Hamza Tariq\",\n      email: \"hamza@example.com\",\n      degree: \"Intermediate\",\n      skills: \"None\",\n      experience_years: 0,\n      availability: \"Immediate\"\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        0
+      ],
+      "id": "8786b847-b038-43f1-848a-252374fb3096",
+      "name": "Mock Candidate Database"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => {\n  const exp = Number(item.json.experience_years) || 0;\n  const skills = (item.json.skills || '').toLowerCase();\n  const degree = (item.json.degree || '').toLowerCase();\n\n  let category = 'Not Eligible';\n  let nextAction = 'Send polite rejection email.';\n\n  // Shortlisting Logic\n  if (exp >= 2 && (skills.includes('n8n') || skills.includes('automation') || skills.includes('python'))) {\n    category = 'Shortlisted';\n    nextAction = 'Schedule technical interview and send invitation email.';\n  } \n  // Needs Review Logic\n  else if (exp >= 1 || skills.includes('n8n') || skills.includes('automation')) {\n    category = 'Needs Review';\n    nextAction = 'Flag for HR manual review and send status update email.';\n  }\n\n  return {\n    json: {\n      ...item.json,\n      category: category,\n      next_action: nextAction\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -352,
+        0
+      ],
+      "id": "835fe4a5-decf-46fe-a4dc-654c37a0d0aa",
+      "name": "Screen and Categorize Candidate"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "Shortlisted",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "5ef3642d-2bdd-4979-9c79-e56be622563a"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Shortlisted"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c61ebe5f-ce7a-4293-a50e-6ca74ac4d98a",
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "Review",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "In Review"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "68f3eb06-222a-46d9-915f-8fe14545c9d4",
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "Not Eligible",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Rejected"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -160,
+        -16
+      ],
+      "id": "f682cbd5-8f30-4bc7-a30e-64efecc6bcac",
+      "name": "Route By Candidate Category"
+    },
+    {
+      "parameters": {
+        "fromEmail": "abdulsubhantanoli1@gmail.com",
+        "toEmail": "abdulsubhantanoli1@gmail.com",
+        "subject": "Congrats",
+        "emailFormat": "text",
+        "text": "={{ $json.candidate_id }}:: {{ $json.name }} you have been {{ $json.category }}.Congrats !!!!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        144,
+        -144
+      ],
+      "id": "e5700ee5-05ca-4d1c-b784-885352ef9077",
+      "name": "Email to shortlisted candidate",
+      "webhookId": "5224aedd-92e4-448f-927a-ce5853b3da94",
+      "credentials": {
+        "smtp": {
+          "id": "b1iR0h9jkya9sITQ",
+          "name": "SMTP account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "abdulsubhantanoli1@gmail.com",
+        "toEmail": "abdulsubhantanoli1@gmail.com",
+        "subject": "we want to let you know",
+        "emailFormat": "text",
+        "text": "={{ $json.candidate_id }}::{{ $json.name }} you application  {{ $json.category }}.we will get back to you shortly!!!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        160,
+        32
+      ],
+      "id": "f08323ac-d5d1-458c-955f-4c3337fb0580",
+      "name": "Email to underreview candidate",
+      "webhookId": "68ea78cf-9a94-42df-bafd-775e967cf6ea",
+      "credentials": {
+        "smtp": {
+          "id": "b1iR0h9jkya9sITQ",
+          "name": "SMTP account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "abdulsubhantanoli1@gmail.com",
+        "toEmail": "abdulsubhantanoli1@gmail.com",
+        "subject": "Sorry!!!!",
+        "emailFormat": "text",
+        "text": "Unfortunately!!! your applicatioon has been rejected due to lack of skills and experience",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        176,
+        240
+      ],
+      "id": "1799a64d-23f4-4ccf-902c-5027c5ea9e16",
+      "name": "Email to rejected Candidate",
+      "webhookId": "49cad531-f961-4563-9822-348f32757c95",
+      "credentials": {
+        "smtp": {
+          "id": "b1iR0h9jkya9sITQ",
+          "name": "SMTP account 4"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Mock Candidate Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mock Candidate Database": {
+      "main": [
+        [
+          {
+            "node": "Screen and Categorize Candidate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Screen and Categorize Candidate": {
+      "main": [
+        [
+          {
+            "node": "Route By Candidate Category",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route By Candidate Category": {
+      "main": [
+        [
+          {
+            "node": "Email to shortlisted candidate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email to underreview candidate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email to rejected Candidate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "b5de7007-dc6d-47e9-8a9d-169fa4bdbff0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "WmutIeM9EqO3lCq7",
+  "tags": []
+}

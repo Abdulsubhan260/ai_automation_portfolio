@@ -1,0 +1,134 @@
+{
+  "name": "week 5 day 5",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        -128
+      ],
+      "id": "2b45555b-6a76-4bcf-84d8-a8209c5b28a2",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "95df7644-c1c5-4ec2-a99f-4bf8cba9ac4a",
+              "name": "message",
+              "value": "Hello team,i need urgent refund for invoice #9021",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -240,
+        -64
+      ],
+      "id": "21f19c68-96b6-49b3-a746-5e06c2046832",
+      "name": "Incoming Customer Message"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5f27075c-85e0-4929-bf6e-36562f7c6bd1",
+              "leftValue": "={{ $json.message.toLowerCase() }}",
+              "rightValue": "refund",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -32,
+        -112
+      ],
+      "id": "76f2fe94-a099-4a86-9420-42de99227d68",
+      "name": "Detect Refund Request"
+    },
+    {
+      "parameters": {
+        "content": "Uses Data Pinning to freeze node payloads for zero-cost debugging and replaces redundant AI with rule logic .\nReplaces slow, expensive LLM calls with 1ms deterministic string matching (.includes()), eliminating token fees"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -720,
+        -128
+      ],
+      "id": "f9604924-0bb4-4c00-9c08-e7972039214f",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {
+    "Incoming Customer Message": [
+      {
+        "json": {
+          "message": "Hello team,i need urgent refund for invoice #9021"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Incoming Customer Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Incoming Customer Message": {
+      "main": [
+        [
+          {
+            "node": "Detect Refund Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c0708af0-5e61-40c4-9474-8560f28c0319",
+  "meta": {
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "R7zMrT6rnsOSDxJ5",
+  "tags": []
+}

@@ -1,0 +1,387 @@
+{
+  "name": "week2 day 6",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-management",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -848,
+        -32
+      ],
+      "id": "728f30ce-c6f2-4a5e-8dd6-ad6d872ddd9e",
+      "name": "Webhook",
+      "webhookId": "0a62a187-a4b1-4783-88a7-9e5c5438a25c"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f82b5422-0397-4122-9b6b-19364d306be4",
+              "leftValue": "={{ $json.body.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "e7af952e-2836-4b96-a0b4-0cddd8ee4017",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "@",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -640,
+        -32
+      ],
+      "id": "77b04857-1056-494f-8e77-2d1033101076",
+      "name": "Validate Incoming Lead"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => {\n  const body = item.json.body || item.json;\n  const name = body.name || '';\n  const email = body.email || '';\n  const company = body.company || 'N/A';\n  const service = body.service || '';\n  const budget = Number(body.budget) || 0;\n\n  let score = 0;\n\n  // Budget Scoring\n  if (budget >= 10000) {\n    score += 50;\n  } else if (budget >= 5000) {\n    score += 30;\n  } else {\n    score += 10;\n  }\n\n  // Service Interest Scoring\n  const serviceLower = service.toLowerCase();\n  if (serviceLower.includes('ai') || serviceLower.includes('enterprise') || serviceLower.includes('automation')) {\n    score += 30;\n  } else {\n    score += 10;\n  }\n\n  // Priority Segmentation\n  let priority = 'Low Priority';\n  if (score >= 70) {\n    priority = 'High Priority';\n  } else if (score >= 40) {\n    priority = 'Medium Priority';\n  }\n\n  return {\n    json: {\n      name,\n      email,\n      company,\n      service,\n      budget,\n      lead_score: score,\n      priority: priority\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -384,
+        -176
+      ],
+      "id": "596cd30c-9393-4521-9ef6-94db187f663d",
+      "name": "Calculate Lead Score"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.priority }}",
+                    "rightValue": "High Priority",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "553ba9b5-edcb-44c0-ba91-55912ddc5a04"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "high priority"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "dd2fe17c-0df9-4025-ac9e-15b79b48ee78",
+                    "leftValue": "={{ $json.priority }}",
+                    "rightValue": "Medium Priority",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "medium priority"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "884af5f1-0238-4f45-9663-56f0f4b126ec",
+                    "leftValue": "={{ $json.priority }}",
+                    "rightValue": "Low Priority",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "low priority"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -192,
+        -32
+      ],
+      "id": "b3631d3d-c7ff-425a-91d1-2f5d036ca2ea",
+      "name": "Route By Property"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "42a238ff-a870-4695-b517-76102601550c",
+              "name": "URGENT_SALES_NOTIFICATION",
+              "value": "=[HIGH PRIORITY LEAD] {{ $json.name }} from {{ $json.company }} (Score: {{ $json.lead_score }}, Budget: ${{ $json.budget }})",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        32,
+        -160
+      ],
+      "id": "04ed242f-b696-4816-ba9b-8ae744ed42cd",
+      "name": "Immediate Sales Alert"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "78456887-f6a9-4e89-9763-f48a3a9e6f32",
+              "name": "Saved to CRM Database",
+              "value": "={{ $json.lead_score }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        32,
+        -16
+      ],
+      "id": "96229baf-4f4a-4076-b790-1d084e53d805",
+      "name": "Save to CRM Sheet"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9a2a9a1c-fd80-4220-85b1-4fdb20e37753",
+              "name": "campaign_status",
+              "value": "Added to Weekly Email Nurture Sequence",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        48,
+        128
+      ],
+      "id": "2122bb43-9ebe-49d7-b5e2-f3d65f594f6d",
+      "name": "Add to Nurture List"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0dcbc865-2128-43a6-8ea0-477ff06bf6c2",
+              "name": "={{ $json.email }}",
+              "value": "=Thank you for contacting us, {{ $json.name }}!",
+              "type": "string"
+            },
+            {
+              "id": "4a1d8c2d-df02-41d2-b76e-9c384e644101",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        400,
+        -16
+      ],
+      "id": "796ac29e-9bec-4297-a5b9-33fdba547797",
+      "name": "Send Acknowledgment Email"
+    },
+    {
+      "parameters": {
+        "content": "lead management system high priority medium and low priority"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -848,
+        -224
+      ],
+      "id": "ab656745-edd3-4983-a02c-597c098b60e7",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Incoming Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Incoming Lead": {
+      "main": [
+        [
+          {
+            "node": "Calculate Lead Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Lead Score": {
+      "main": [
+        [
+          {
+            "node": "Route By Property",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route By Property": {
+      "main": [
+        [
+          {
+            "node": "Immediate Sales Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save to CRM Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add to Nurture List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Immediate Sales Alert": {
+      "main": [
+        [
+          {
+            "node": "Send Acknowledgment Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to CRM Sheet": {
+      "main": [
+        [
+          {
+            "node": "Send Acknowledgment Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Nurture List": {
+      "main": [
+        [
+          {
+            "node": "Send Acknowledgment Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c023dc4f-05c5-4a9c-b351-6d6fb5b8be0e",
+  "meta": {
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "qrH5wDwElTHd32eh",
+  "tags": []
+}

@@ -1,0 +1,262 @@
+{
+  "name": "week 2 day 5",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-lead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -720,
+        -160
+      ],
+      "id": "a03abb3a-be69-491f-a86f-1ed4bfb245c2",
+      "name": "new lead",
+      "webhookId": "c7e514ad-0959-43d0-9420-45e8e8f88c7a"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1c0bd93f-e278-4ca2-9bac-cfd2f3398715",
+              "leftValue": "={{ $json.body.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "e1c565e9-0cee-4a53-b5e1-6e220892cee6",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "@",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -576,
+        -160
+      ],
+      "id": "e320e2fc-4961-446f-99d0-cf6a3f181a3a",
+      "name": "validate lead"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.agify.io/?name={{ $json.body.name.split(' ')[0] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -336,
+        -176
+      ],
+      "id": "24ac59de-5dc8-443b-9cbb-d7299dda8ddb",
+      "name": "API Lookup (Agify)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "83a3d060-09de-41c8-8f8e-bdf63058592d",
+              "name": "name",
+              "value": "={{ $('new lead').item.json.body.name }}",
+              "type": "string"
+            },
+            {
+              "id": "e1131e15-9cb9-48ac-bb60-d05b27ef7095",
+              "name": "email",
+              "value": "={{ $('new lead').item.json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "a4cf5020-4f83-4bae-a20c-ba66720ad7be",
+              "name": "company",
+              "value": "={{ $('new lead').item.json.body.company || 'Not Provided' }}",
+              "type": "string"
+            },
+            {
+              "id": "617ecad5-9d4c-483b-a424-035f56c7073f",
+              "name": "enrcihed_age",
+              "value": "={{ $json.age }}",
+              "type": "string"
+            },
+            {
+              "id": "ab287abf-1b18-4c71-b570-b04052b39dca",
+              "name": "db_status",
+              "value": "persisted",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -128,
+        -176
+      ],
+      "id": "3d8a78ba-41b3-475f-92df-282b663fd2b5",
+      "name": "save lead"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7e562697-b7d7-472a-b715-9a63ffea7592",
+              "name": "send_to",
+              "value": "sales@yourcompany.com",
+              "type": "string"
+            },
+            {
+              "id": "80bb2b20-bfb6-4dbe-8745-5e4e8dc4f687",
+              "name": "subject",
+              "value": "=[New Lead] {{ $json.name }} from {{ $json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "723c6a3e-4326-41ce-84db-17f2cc91b9c6",
+              "name": "html_body",
+              "value": "=<h3>New Lead Received</h3> <p><b>Name:</b> {{ $json.name }}</p> <p><b>Email:</b> {{ $json.email }}</p> <p><b>Company:</b> {{ $json.company }}</p> <hr /> <p><b>Enriched Insights:</b></p> <p><b>Estimated Age:</b> {{ $json.enriched_age }} (calculated via Agify API)</p>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        -176
+      ],
+      "id": "23bb40e0-cc9b-4ef4-baa0-ace6ecdc21be",
+      "name": "email notify"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"success\",\n  \"message\": \"Lead processed and sales notified.\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        288,
+        -176
+      ],
+      "id": "450911be-54bf-4be8-a322-76888131c5b7",
+      "name": "Respond Success"
+    },
+    {
+      "parameters": {
+        "content": "in this and previous workflow we have to enter link/url into postman(from first webhook node) and then execute work flow from here and then send from postman and can see result here as well in postman"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        0
+      ],
+      "id": "5ff580af-8671-40cc-9464-043a2e78f1c6",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "new lead": {
+      "main": [
+        [
+          {
+            "node": "validate lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validate lead": {
+      "main": [
+        [
+          {
+            "node": "API Lookup (Agify)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API Lookup (Agify)": {
+      "main": [
+        [
+          {
+            "node": "save lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "save lead": {
+      "main": [
+        [
+          {
+            "node": "email notify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "email notify": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "074a2e14-b18b-461d-bb38-5bb22339b249",
+  "meta": {
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "5sQUN0UWRhc5WWnN",
+  "tags": []
+}
