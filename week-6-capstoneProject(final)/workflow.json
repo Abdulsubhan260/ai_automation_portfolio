@@ -1,0 +1,752 @@
+{
+  "name": "capstone project internship tasks",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "customer-support-intake",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1264,
+        32
+      ],
+      "id": "7afd07da-75a4-4dc0-b301-002887e29ba9",
+      "name": "Customer Support Intake",
+      "webhookId": "49f51906-2fa6-4eca-ae90-2bdaf47a9408"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d24ab50a-f2a7-4150-994f-78de681f1136",
+              "leftValue": "={{ $json.body.customer_name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "28abaf88-153d-4d5c-b5eb-da3627441dee",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "@",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "9525546b-0397-465e-8e8c-c5618a67cf5f",
+              "leftValue": "={{ $json.body.message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1040,
+        32
+      ],
+      "id": "83a22742-f0bb-49d4-b5f8-09c615997042",
+      "name": "Validate Support Payload"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following customer support message and extract all required structured triage fields.\n\nCustomer Name: {{ $('Customer Support Intake').item.json.body.customer_name }}\nCustomer Email: {{ $('Customer Support Intake').item.json.body.email }}\nSupport Message:\n{{ $('Customer Support Intake').item.json.body.message }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -768,
+        -176
+      ],
+      "id": "f599066c-1522-4e96-a75a-154c7a8e1311",
+      "name": "AI Triage (Groq)"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        0
+      ],
+      "id": "5d525fe8-6462-4065-9bff-ccaa50a28d02",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"category\": \"Technical Support\",\n  \"priority\": \"Urgent\",\n  \"sentiment\": \"Frustrated\",\n  \"department\": \"Tech Support\",\n  \"summary\": \"Customer experienced a critical database server crash and outage.\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -672,
+        -16
+      ],
+      "id": "ff175f9b-6aff-4158-a49c-46d331373325",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "company-knowledge",
+          "mode": "list",
+          "cachedResultName": "company-knowledge"
+        },
+        "prompt": "={{ $json.output.summary }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -416,
+        -176
+      ],
+      "id": "c0546708-254e-40df-8499-7644d4deea64",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "m0G3KZLrmykhtNqS",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "sentence-transformers/all-MiniLM-L6-v2",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsHuggingFaceInference",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        -16
+      ],
+      "id": "5ec3bde9-d00f-4936-a6db-d08e04c00a47",
+      "name": "Embeddings HuggingFace Inference",
+      "credentials": {
+        "huggingFaceApi": {
+          "id": "09th7Ll2hIc6zINa",
+          "name": "Hugging Face account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an automated support agent. Draft a polite, professional reply to the customer using ONLY the provided help documentation context.\n\nCustomer Name: {{ $('Customer Support Intake').item.json.body.customer_name }}\nOriginal Message: {{ $('Customer Support Intake').item.json.body.message }}\n\nHelp Documentation Context:\n{{ $json.pageContent }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -80,
+        -176
+      ],
+      "id": "a0af395f-be88-491b-b806-ef10441148bc",
+      "name": "Draft Response"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -16
+      ],
+      "id": "a0f39079-7b8d-44ff-98aa-52e0bb7ae4cc",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tickets",
+          "mode": "list",
+          "cachedResultName": "tickets"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "customer_name": "={{ $('Customer Support Intake').item.json.body.customer_name }}",
+            "email": "={{ $('Customer Support Intake').item.json.body.email }}",
+            "category": "={{ $(\"AI Triage (Groq)\").item.json.output.category }}",
+            "priority": "={{ $('AI Triage (Groq)').item.json.output.priority }}",
+            "ai_summary": "={{ $('AI Triage (Groq)').item.json.output.summary }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ticket_id",
+              "displayName": "ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_summary",
+              "displayName": "ai_summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        288,
+        -176
+      ],
+      "id": "c80048f9-c9ab-407c-a18f-628332f34421",
+      "name": "Log Ticket",
+      "credentials": {
+        "postgres": {
+          "id": "pbD6epjkkkKbLjRg",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"success\",\n  \"message\": \"Support ticket received and logged in database.\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        528,
+        -288
+      ],
+      "id": "7e3c24b2-1662-4338-a982-8a56a0b1e53a",
+      "name": "Respond 200 OK"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "dc1c7c9a-2aa8-4be3-9b55-5415859bd649",
+              "leftValue": "={{ $('AI Triage (Groq)').item.json.output.priority.toLowerCase() }}",
+              "rightValue": "urgent",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "c3417fe4-07dd-467e-9409-b245663918c3",
+              "leftValue": "={{ $('AI Triage (Groq)').item.json.output.priority.toLowerCase() }}",
+              "rightValue": "high",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        544,
+        -80
+      ],
+      "id": "485820d2-a0d1-49c7-974c-ec052af1421f",
+      "name": "Check Urgent Escalation"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a39047da-677e-49cd-9fb8-919c2f629451",
+              "name": "sent_to",
+              "value": "={{ $('Customer Support Intake').item.json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "5843b93e-ffee-4d1f-9df4-8c6c6d24e17d",
+              "name": "subject",
+              "value": "=Support Ticket #{{ $('Log Ticket').item.json.ticket_id }} Received",
+              "type": "string"
+            },
+            {
+              "id": "5061f781-6c62-4bd3-a3eb-3283819c5ffb",
+              "name": "body",
+              "value": "=Dear {{ $('Customer Support Intake').item.json.body.customer_name }}, thank you for contacting support. Here is your drafted solution: {{ $('Draft Response').item.json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        864,
+        64
+      ],
+      "id": "11879cd3-9625-429d-ad7e-0bc972d02bd5",
+      "name": "Send Auto-Reply Resolution"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "options": {
+          "webhookSuffix": "escalation-check"
+        }
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        864,
+        -240
+      ],
+      "id": "321d9743-d295-4afe-8aa9-c14dd1e613e8",
+      "name": "Human-in-the-Loop Review",
+      "webhookId": "6b4e4ffd-fe43-47a4-ba03-9f8614caf349"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4c024dc2-b7f8-4bff-8c90-ead58ff2e76a",
+              "leftValue": "={{ $json.query.decision }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1088,
+        -240
+      ],
+      "id": "579f7def-f9d5-458c-96df-6486c36e57b8",
+      "name": "Check Human Approval"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "37ee238d-a404-442d-821a-40e4313f30ca",
+              "name": "sent_to",
+              "value": "={{ $('Customer Support Intake').item.json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "846e1fcd-d61c-4d82-a010-ddfb4509b4ee",
+              "name": "subject",
+              "value": "=Urgent Update regarding ticket #{{ $('Log Ticket').item.json.ticket_id }}",
+              "type": "string"
+            },
+            {
+              "id": "7402ff00-ce5a-4ebf-876a-c9886b91093e",
+              "name": "body",
+              "value": "=Dear {{ $('Customer Support Intake').item.json.body.customer_name }}, Our technical lead has reviewed your urgent ticket and approved this resolution: {{ $('Draft Response').item.json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1424,
+        -448
+      ],
+      "id": "a64c9ef2-9207-4072-ac8d-e6c265e49395",
+      "name": "Send Approved Resolution"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "18c89256-9b96-4c46-8c31-847417d38838",
+              "name": "sent_to",
+              "value": "={{ $('Customer Support Intake').item.json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "f0cfcfce-00e9-445d-a573-29e920feb437",
+              "name": "subject",
+              "value": "=Support Ticket Status #{{ $('Log Ticket').item.json.ticket_id }}",
+              "type": "string"
+            },
+            {
+              "id": "1c592ff0-7697-4ad0-b834-fd26c5a342ce",
+              "name": "body",
+              "value": "=Dear {{ $('Customer Support Intake').item.json.body.customer_name }}, Your request is currently being manually reviewed by our engineering support team.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1424,
+        -96
+      ],
+      "id": "e220e692-eda5-4780-9e5b-cd27f921723a",
+      "name": "Send Manual Review Notification"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        192
+      ],
+      "id": "b5f3892a-01c0-4124-a050-7bcf09d97278",
+      "name": "Groq Chat Model2",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Customer Support Intake": {
+      "main": [
+        [
+          {
+            "node": "Validate Support Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Support Payload": {
+      "main": [
+        [
+          {
+            "node": "AI Triage (Groq)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Triage (Groq)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Triage (Groq)",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Triage (Groq)": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings HuggingFace Inference": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Draft Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Draft Response",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Response": {
+      "main": [
+        [
+          {
+            "node": "Log Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Ticket": {
+      "main": [
+        [
+          {
+            "node": "Respond 200 OK",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check Urgent Escalation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Urgent Escalation": {
+      "main": [
+        [
+          {
+            "node": "Human-in-the-Loop Review",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Auto-Reply Resolution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human-in-the-Loop Review": {
+      "main": [
+        [
+          {
+            "node": "Check Human Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Human Approval": {
+      "main": [
+        [
+          {
+            "node": "Send Approved Resolution",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Manual Review Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "b0c86158-2a1a-4f5d-8bed-9e5e76506715",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "OZHhej0JbypJw35j",
+  "tags": []
+}
