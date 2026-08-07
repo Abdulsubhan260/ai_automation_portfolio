@@ -1,0 +1,79 @@
+{
+  "name": "week 2 day 3",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        -32
+      ],
+      "id": "0b45870f-56eb-4215-8fe1-d2b68f4c5443",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: { name: \"  jOHn dOE  \", email: \"JOHn@ExaMPle.com\", score: 95 } },\n  { json: { name: \"alice smith\", email: \"ALICE@test.com\", score: 85 } },\n  { json: { name: \"   bOB jOnes\", email: \"Bob.JONES@domain.com\", score: 72 } },\n  { json: { name: \"cHarliE bROwn \", email: \"charlie@BROWN.com\", score: 88 } },\n  { json: { name: \"diana prince\", email: \"DIANA@prince.com\", score: 92 } },\n  { json: { name: \"evan wright\", email: \"evan@wright.com\", score: 50 } },\n  { json: { name: \"  FIONA gallaGHer  \", email: \"fiona@G.com\", score: 78 } },\n  { json: { name: \"george CLOONEY\", email: \"GEORGE@clooney.com\", score: 81 } },\n  { json: { name: \"haNNAh abbott\", email: \"hannah@abbott.com\", score: 65 } },\n  { json: { name: \"IAN malcolm\", email: \"ian@malcolm.com\", score: 89 } },\n  { json: { name: \"  jessica jones\", email: \"JESS@jones.com\", score: 99 } },\n  { json: { name: \"kyle REESE\", email: \"KYLE@reese.com\", score: 45 } },\n  { json: { name: \"luke skywalker  \", email: \"LUKE@skywalker.com\", score: 82 } },\n  { json: { name: \"mARy jane\", email: \"mary@jane.com\", score: 76 } },\n  { json: { name: \"NANCY drew\", email: \"NANCY@drew.com\", score: 90 } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        -32
+      ],
+      "id": "62c19a9a-c559-4f68-b23e-0525767af216",
+      "name": "15 Messy Records"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Retrieve the array of all 15 messy items from the previous node\nconst items = $input.all();\n\n// 2. Use .map() to loop through and clean every record\nconst processedItems = items.map(item => {\n    const rawName = item.json.name || \"\";\n    const rawEmail = item.json.email || \"\";\n    const score = item.json.score || 0;\n\n    // A. Normalize Name: Trim spaces, make lowercase, then capitalize the first letter of each word (Title Case)\n    const cleanName = rawName\n        .trim()\n        .toLowerCase()\n        .split(' ')\n        .filter(word => word.length > 0) // removes double spaces\n        .map(word => word.charAt(0).toUpperCase() + word.slice(1))\n        .join(' ');\n\n    // B. Normalize Email: Trim spaces and make entirely lowercase\n    const cleanEmail = rawEmail.trim().toLowerCase();\n\n    // C. Compute Grade based on numeric score\n    let grade = 'F';\n    if (score >= 90) {\n        grade = 'A';\n    } else if (score >= 80) {\n        grade = 'B';\n    } else if (score >= 70) {\n        grade = 'C';\n    } else if (score >= 60) {\n        grade = 'D';\n    }\n\n    // Return the newly cleaned object, keeping the strict n8n { json: {} } structure\n    return {\n        json: {\n            name: cleanName,\n            email: cleanEmail,\n            score: score,\n            grade: grade\n        }\n    };\n});\n\n// 3. Use .filter() to keep ONLY records where the grade is A or B (Grade >= B)\nconst topStudents = processedItems.filter(item => {\n    return item.json.grade === 'A' || item.json.grade === 'B';\n});\n\n// 4. Return the final filtered list to output to the next node\nreturn topStudents;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        -32
+      ],
+      "id": "e184bafe-b69b-4c37-929b-cf52cd34225c",
+      "name": "Transform and filter"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "15 Messy Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "15 Messy Records": {
+      "main": [
+        [
+          {
+            "node": "Transform and filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e98435b7-a304-48cf-b199-c1a55a89a4d5",
+  "meta": {
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "gu9rAZfyiUW9AsbC",
+  "tags": []
+}
