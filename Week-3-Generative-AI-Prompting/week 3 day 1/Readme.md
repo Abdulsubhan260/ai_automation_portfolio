@@ -1,0 +1,2 @@
+# Day 13: LLM Provider Manual Postman Evaluations
+This folder contains my initial LLM API manual testing documentation. I executed direct REST API POST requests inside Postman to test Google Gemini and Groq, comparing their latencies, costs, and token processing capabilities.

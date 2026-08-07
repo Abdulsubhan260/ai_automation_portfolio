@@ -1,0 +1,2 @@
+# Day 5: Google Sheets & Email Automation
+This folder contains an end-to-end spreadsheet processing pipeline. It reads applicant rows from Google Sheets, applies eligibility criteria, updates the sheet with the classification result, and dispatches personalized emails via Gmail.

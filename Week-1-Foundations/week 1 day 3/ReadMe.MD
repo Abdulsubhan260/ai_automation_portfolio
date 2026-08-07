@@ -1,0 +1,2 @@
+# Day 3: JSON Data Shaping & Classification
+This folder contains a data shaping and classification workflow. It processes raw student/employee records as JSON payloads, evaluates numeric scores using logical ternary expressions, and outputs structured, classified JSON objects.

@@ -1,0 +1,2 @@
+# Day 24 (Assignment 4): Company Knowledge AI Assistant
+This is my Week 4 Assignment: an enterprise-grade company knowledge assistant. It ingests 20+ detailed company SOPs into a Pinecone index (via Hugging Face) and resolves user queries with conversation memory and strict hallucination guardrails.

@@ -1,0 +1,2 @@
+# Day 11: Multi-System Enrichment Integration
+This folder contains a multi-system automation pipeline. It captures incoming leads via Webhook, queries a public API to enrich demographics based on the lead's first name, logs the record, and alerts the sales team.

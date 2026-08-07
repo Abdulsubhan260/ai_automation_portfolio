@@ -1,0 +1,2 @@
+# Day 2: Scheduled Daily Reminder
+This folder contains an n8n workflow that automates daily reminders. It utilizes a Schedule Trigger to fire every weekday morning, constructs a customized progress-submission reminder payload, and dispatches it dynamically as an alert.

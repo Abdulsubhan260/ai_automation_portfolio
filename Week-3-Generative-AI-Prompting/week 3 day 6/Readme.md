@@ -1,0 +1,2 @@
+# Day 18 (Assignment 3): AI Customer Support Triage System
+This is my Week 3 Assignment: a production-style support ticket triage engine. It extracts ticket category, priority, sentiment, and summary into a validated JSON schema, routes the ticket, and triggers emergency alerts for urgent issues.

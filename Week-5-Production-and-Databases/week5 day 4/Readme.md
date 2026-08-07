@@ -1,0 +1,2 @@
+# Day 28: Human-in-the-Loop Approval (Wait Node)
+This folder contains an automated approval workflow. It utilizes n8n's Wait node to suspend execution on sensitive actions (like financial refunds), generates a secure resume URL, and resumes only after receiving an approved human click.

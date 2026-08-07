@@ -1,0 +1,2 @@
+# Day 29: Performance Optimization & Data Pinning
+This folder contains my workflow optimization tasks. I utilized Data Pinning to freeze mock payloads for zero-cost downstream testing, and optimized speed by replacing a slow, expensive LLM call with a 1ms deterministic string match.

@@ -1,0 +1,2 @@
+# Day 4: Logic Branching & Transformation
+This folder contains a data routing and transformation workflow. It routes ten sample records into three distinct logical branches using a Switch node based on scores, appending customized status and action variables to each record.

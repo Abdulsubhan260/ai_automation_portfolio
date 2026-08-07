@@ -1,0 +1,2 @@
+# Day 14: Prompt Engineering & Structured JSON Prompts
+This folder contains a reusable prompt library designed for business automations. Each prompt utilizes the strict ROLE-CONTEXT-TASK-RULES framework to force different LLM models to return structured, predictable JSON payloads.

@@ -1,0 +1,2 @@
+# Day 8: HTTP Request Node & Authentication
+This folder contains an n8n workflow that consumes external APIs. It utilizes the HTTP Request node to fetch live meteorological data from a public weather API, evaluates conditions, and sends automated rain-alert notifications.

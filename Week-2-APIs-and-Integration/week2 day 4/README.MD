@@ -1,0 +1,2 @@
+# Day 10: Event-Driven Webhooks
+This folder contains an event-driven webhook intake pipeline. It configures a Webhook trigger node to listen for external POST requests, validates payloads, and returns custom HTTP status codes (200 Success vs. 400 Bad Request) back to the sender.

@@ -1,0 +1,2 @@
+# Day 21: RAG Policy Assistant
+This folder contains a conversational Q&A RAG assistant. It queries a vector database, retrieves matching policies to ground the LLM, cites the source document, and falls back to "Information not available" to prevent hallucinations.

@@ -1,0 +1,2 @@
+# Day 20: Document Ingestion & Embeddings Pipeline
+This folder contains a document ingestion pipeline. It extracts text from raw company policy documents, splits them into optimal semantic chunks, generates 384-dimensional vector embeddings, and stores them in a Pinecone vector database.

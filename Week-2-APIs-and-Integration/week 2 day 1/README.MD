@@ -1,0 +1,2 @@
+# Day 7: API Fundamentals & Postman Exploration
+This folder contains my manual API testing documentation. Using Postman, I executed GET requests against a public quotes API to inspect JSON response schemas (200 OK) and intentionally triggered errors to study HTTP status codes (404 Not Found).

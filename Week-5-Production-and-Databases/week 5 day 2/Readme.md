@@ -1,0 +1,2 @@
+# Day 26: Resilient Error Handling & Node Retries
+This folder contains a production-grade error handling workflow. It configures node retries and alternate error output branching to capture API failures, log the exception payload, and notify system administrators without crashing the execution.

@@ -1,0 +1,2 @@
+# Day 22: AI Agent with Conversation Memory
+This folder contains an autonomous AI Agent equipped with memory. It utilizes an AI Agent node with Simple Memory and a Vector Store search tool to answer questions while remembering context across multi-turn conversations.

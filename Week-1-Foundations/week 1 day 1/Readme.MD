@@ -1,0 +1,2 @@
+# Day 1: Onboarding & BPA Opportunities
+This folder contains my onboarding assessment and automation opportunities audit. I analyzed five manual business processes within a typical agency, mapping out their specific pain points, triggers, data inputs, and the operational benefits of automating them.

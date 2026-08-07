@@ -1,0 +1,2 @@
+# Day 12 (Assignment 2): Automated Lead Management System
+This is my Week 2 Assignment: an automated lead scoring and segmentation engine. It receives lead payloads, calculates priority scores based on budget and service interest, routes them to distinct sales branches, and sends automated receipts.

@@ -1,0 +1,2 @@
+# Day 9: JavaScript Data Transformations (Code Node)
+This folder contains an advanced data cleaning workflow using native JavaScript. It runs a single Code node to trim and title-case messy names, lowercase emails, calculate grades via `.map()`, and filter out failing records via `.filter()`.

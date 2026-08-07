@@ -1,0 +1,2 @@
+# Day 25: Relational Postgres Database CRUD (Supabase)
+This folder contains a relational database workflow. It connects n8n to a managed PostgreSQL database in Supabase over secure SSL connections to execute fundamental CRUD operations (Insert, Select, Update, Delete) on a tickets table.

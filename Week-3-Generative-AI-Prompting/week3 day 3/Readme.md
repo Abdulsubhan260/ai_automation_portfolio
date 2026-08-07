@@ -1,0 +1,2 @@
+# Day 15: LLM Categorizer Chain
+This folder contains an AI-powered email triage workflow in n8n. It integrates Llama 3 (via Groq) to analyze incoming customer email text, classify the intent, and route the workflow down matching downstream branches.

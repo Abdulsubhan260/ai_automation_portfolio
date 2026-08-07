@@ -1,0 +1,2 @@
+# Day 27: Webhook Endpoint Header Security
+This folder contains a webhook security workflow. It implements header verification to protect public endpoints, evaluating incoming requests for a custom `x-secret-token` and immediately blocking unauthorized calls with 401 Unauthorized status codes.

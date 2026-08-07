@@ -1,0 +1,2 @@
+# Day 19: RAG Architecture & Fundamentals
+This folder contains my theoretical analysis of Retrieval-Augmented Generation (RAG). It details the ingestion and query pipelines, explains the mathematical concept of embeddings, and highlights why chunk size is critical to AI context.

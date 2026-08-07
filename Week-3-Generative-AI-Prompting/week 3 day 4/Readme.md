@@ -1,0 +1,2 @@
+# Day 16: Structured AI Output & Fallback Parsing
+This folder contains an advanced AI parsing workflow. It attaches a Structured Output Parser to an LLM chain to enforce a strict JSON output, utilizing auto-fix formatting and an IF validation node with fallback defaults for vague inputs.

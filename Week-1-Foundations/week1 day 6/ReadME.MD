@@ -1,0 +1,2 @@
+# Day 6 (Assignment 1): Candidate Screening Automation
+This is my Week 1 Assignment: an automated recruitment screening system. It ingests candidate data, validates required fields, applies screening rules to segment applicants into three categories, and sends tailored notification emails.

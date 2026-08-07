@@ -1,0 +1,2 @@
+# Day 17: Provider Comparison & Evaluation Report
+This folder contains my benchmarking report comparing Gemini and Groq. I evaluated both models on a standardized 10-email classification test set, recording accuracy, average latency, and financial costs per 1,000 runs.

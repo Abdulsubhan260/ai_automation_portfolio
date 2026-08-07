@@ -1,0 +1,2 @@
+# Day 30 (Assignment 5): AI-Assisted Recruitment Automation
+This is my Week 5 Assignment: an automated recruitment screening pipeline. It uses AI to extract candidate skills and scores, pauses for manual recruiter review via a Wait node, and then updates the database and dispatches custom emails.

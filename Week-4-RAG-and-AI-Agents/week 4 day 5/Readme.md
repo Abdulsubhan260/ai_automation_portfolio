@@ -1,0 +1,2 @@
+# Day 23: Multi-Tool Agent with Human Safeguards
+This folder contains an advanced AI Agent connected to multiple tools. It combines a Wikipedia search, a custom HTTP API tool, and a Google Sheets logger, utilizing strict prompt boundaries to require human approval for database writes.
