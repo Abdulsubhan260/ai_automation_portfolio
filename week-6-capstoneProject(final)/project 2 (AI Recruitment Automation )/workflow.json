@@ -1,0 +1,1312 @@
+{
+  "name": "capstone project internship tasks(2)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "candidate-application",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1296,
+        64
+      ],
+      "id": "be4b3865-25a8-443c-8366-1ce451ad040b",
+      "name": "Candidate Application Intake",
+      "webhookId": "48f14c8e-0ada-407d-8641-9f458d6c26d5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9ca0bece-0666-41b8-95d4-a64c748e8322",
+              "leftValue": "={{ $json.body.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "0fef91d2-2584-4adc-881d-d6896849908c",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "c43ffd02-a151-42ec-95ee-8ea1e4b1f849",
+              "leftValue": "={{ $json.body.role_applied }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "63e79773-c4d3-42de-9868-6a27e213f472",
+              "leftValue": "={{ $json.body.resume_text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1136,
+        64
+      ],
+      "id": "43c90db9-7420-46e0-ad0b-d2b106a7c08c",
+      "name": "Validate Application Payload"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "applicants",
+          "mode": "list",
+          "cachedResultName": "applicants"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fit_score": 0,
+            "name": "={{ $('Candidate Application Intake').item.json.body.name }}",
+            "email": "={{ $('Candidate Application Intake').item.json.body.email }}",
+            "role_applied": "={{ $('Candidate Application Intake').item.json.body.role_applied }}",
+            "resume_text": "={{ $('Candidate Application Intake').item.json.body.resume_text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "applicant_id",
+              "displayName": "applicant_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role_applied",
+              "displayName": "role_applied",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "resume_text",
+              "displayName": "resume_text",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "extracted_skills",
+              "displayName": "extracted_skills",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fit_score",
+              "displayName": "fit_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -976,
+        48
+      ],
+      "id": "9ed13c7b-53cf-4210-8996-59690d8951be",
+      "name": "Log Raw Application",
+      "credentials": {
+        "postgres": {
+          "id": "pbD6epjkkkKbLjRg",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"success\",\n  \"message\": \"Application received and successfully logged.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -816,
+        272
+      ],
+      "id": "ad1f0bd7-0eb6-4a0a-991d-318223a66d37",
+      "name": "Respond 200 OK"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an advanced HR Talent Acquisition AI. Your task is to analyze the candidate's raw resume text and assess their suitability for the specific role they applied for.\n\nRole Applied For: {{ $('Candidate Application Intake').item.json.body.role_applied }}\nCandidate Name: {{ $('Candidate Application Intake').item.json.body.name }}\nResume Text:\n{{ $('Candidate Application Intake').item.json.body.resume_text }}\n\nCalculate a fit score from 0 to 100 based on how well their skills and experience match the requirements of the applied role. If their fit score is 80 or above, set the recommendation to \"Shortlist\". Otherwise, set it to \"Reject\". Write a concise 2-sentence summary of their experience.",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -768,
+        -224
+      ],
+      "id": "62b3fa91-af41-4992-bfde-5221f5fb95ea",
+      "name": "AI Resume Assessor"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {
+          "maxTokensToSample": 4096
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        48
+      ],
+      "id": "12a42ef0-1e21-4d38-bdbd-fa4f37fcb359",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"name\": \"Ahmed Hassan\",\n  \"skills\": \"Node.js, Python, n8n, API Integrations\",\n  \"summary\": \"Highly experienced developer with 4 years of experience in backend development and workflow automations.\",\n  \"fit_score\": 85,\n  \"recommendation\": \"Shortlist\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -560,
+        16
+      ],
+      "id": "8db86998-a48a-4956-bbbf-b96123652d3a",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        208
+      ],
+      "id": "4141a46e-9f50-43b5-b694-647c0330e136",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "applicants",
+          "mode": "list",
+          "cachedResultName": "applicants"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "applicant_id": "={{ $('Log Raw Application').item.json.applicant_id }}",
+            "extracted_skills": "={{ $('AI Resume Assessor').item.json.output.skills }}",
+            "fit_score": "={{ $('AI Resume Assessor').item.json.output.fit_score }}",
+            "summary": "={{ $('AI Resume Assessor').item.json.output.summary }}"
+          },
+          "matchingColumns": [
+            "applicant_id"
+          ],
+          "schema": [
+            {
+              "id": "applicant_id",
+              "displayName": "applicant_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role_applied",
+              "displayName": "role_applied",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "resume_text",
+              "displayName": "resume_text",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "extracted_skills",
+              "displayName": "extracted_skills",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fit_score",
+              "displayName": "fit_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -496,
+        -224
+      ],
+      "id": "1509580a-adb9-4703-a44a-380f70b9c64f",
+      "name": "Update DB with AI Assessment",
+      "credentials": {
+        "postgres": {
+          "id": "pbD6epjkkkKbLjRg",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f239a4c6-716c-46af-b6dc-9494178d4c03",
+              "leftValue": "={{ $('AI Resume Assessor').item.json.output.fit_score }}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -352,
+        -224
+      ],
+      "id": "75ef1755-55ef-4bf9-82c2-93051dfecd77",
+      "name": "Check Fit Score"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "applicants",
+          "mode": "list",
+          "cachedResultName": "applicants"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fit_score": 0,
+            "applicant_id": "={{ $('Log Raw Application').item.json.applicant_id }}",
+            "status": "Auto-Rejected"
+          },
+          "matchingColumns": [
+            "applicant_id"
+          ],
+          "schema": [
+            {
+              "id": "applicant_id",
+              "displayName": "applicant_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role_applied",
+              "displayName": "role_applied",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "resume_text",
+              "displayName": "resume_text",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "extracted_skills",
+              "displayName": "extracted_skills",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fit_score",
+              "displayName": "fit_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -128,
+        -32
+      ],
+      "id": "377b9e8b-f336-46f8-ae49-fa27aac9a6e8",
+      "name": "Update DB (Auto-Rejected)",
+      "credentials": {
+        "postgres": {
+          "id": "pbD6epjkkkKbLjRg",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6171c3f4-8a92-468e-a487-42a097791ecb",
+              "name": "email_to",
+              "value": "={{ $('Candidate Application Intake').item.json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "a1a481e5-c3f3-4349-8df0-7be08dc4d93f",
+              "name": "subject",
+              "value": "Application Status - Petalnex",
+              "type": "string"
+            },
+            {
+              "id": "a2e79aaa-0502-41e0-a7e2-3db50857b18b",
+              "name": "body",
+              "value": "=Dear {{ $('Candidate Application Intake').item.json.body.name }}, thank you for your application for the {{ $('Candidate Application Intake').item.json.body.role_applied }} role. Unfortunately, we are moving forward with other candidates at this time.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        64,
+        -32
+      ],
+      "id": "bbd74d9c-937f-45cd-9cfd-61135d46778b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "options": {
+          "webhookSuffix": "recruiter-decision"
+        }
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -128,
+        -240
+      ],
+      "id": "21ae2ede-5aff-43c3-a752-d4de7772abb3",
+      "name": "Wait for Recruiter Review",
+      "webhookId": "e74b24c6-4093-4fc4-a86f-c9cb820d1bff"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3b10a054-0f65-4534-af71-a83c752ac3bc",
+              "leftValue": "={{ $json.query.decision }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        80,
+        -240
+      ],
+      "id": "9c16b50b-e913-43ad-b506-421ead7f9af0",
+      "name": "Check Recruiter Decision"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "applicants",
+          "mode": "list",
+          "cachedResultName": "applicants"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fit_score": 0,
+            "applicant_id": "={{ $('Log Raw Application').item.json.applicant_id }}",
+            "status": "Shortlisted - Interview Scheduled"
+          },
+          "matchingColumns": [
+            "applicant_id"
+          ],
+          "schema": [
+            {
+              "id": "applicant_id",
+              "displayName": "applicant_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role_applied",
+              "displayName": "role_applied",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "resume_text",
+              "displayName": "resume_text",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "extracted_skills",
+              "displayName": "extracted_skills",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fit_score",
+              "displayName": "fit_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        320,
+        -80
+      ],
+      "id": "3dea4ed9-2626-4b54-a519-154e3e1944af",
+      "name": "Update DB (Shortlisted)",
+      "credentials": {
+        "postgres": {
+          "id": "pbD6epjkkkKbLjRg",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12cb6b21-f9b0-4e9e-8e50-069e20120cd1",
+              "name": "email_to",
+              "value": "={{ $('Candidate Application Intake').item.json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "4408e9af-0497-4054-a1b2-908de8dc01ce",
+              "name": "subject",
+              "value": "=Interview Invitation - {{ $('Candidate Application Intake').item.json.body.role_applied }} - Petalnex",
+              "type": "string"
+            },
+            {
+              "id": "0e666d42-ef2e-4491-b42a-bc19889993a2",
+              "name": "body",
+              "value": "=Dear {{ $('Candidate Application Intake').item.json.body.name }}, congratulations! Your profile has been reviewed by our team with an AI fit score of {{ $('AI Resume Assessor').item.json.output.fit_score }}/100. Please use this link to schedule your technical interview: https://calendly.com/petalnex-interview",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        496,
+        -80
+      ],
+      "id": "4e517234-c06d-4e3b-b116-b8c161a7226c",
+      "name": "Send Email to shortlisted candidates"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "applicants",
+          "mode": "list",
+          "cachedResultName": "applicants"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fit_score": 0,
+            "applicant_id": "={{ $('Log Raw Application').item.json.applicant_id }}",
+            "status": "Rejected - HR Review"
+          },
+          "matchingColumns": [
+            "applicant_id"
+          ],
+          "schema": [
+            {
+              "id": "applicant_id",
+              "displayName": "applicant_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role_applied",
+              "displayName": "role_applied",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "resume_text",
+              "displayName": "resume_text",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "extracted_skills",
+              "displayName": "extracted_skills",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fit_score",
+              "displayName": "fit_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        352,
+        240
+      ],
+      "id": "a9805bd0-33ff-45ad-94c0-4762558783e9",
+      "name": "Update rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "pbD6epjkkkKbLjRg",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d2c43db8-597b-4b48-91e4-f8d5d6fab35d",
+              "name": "email_to",
+              "value": "={{ $('Candidate Application Intake').item.json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "18d7171b-197f-4640-b4f0-3b7c9963be92",
+              "name": "subject",
+              "value": "Application Status - Petalnex",
+              "type": "string"
+            },
+            {
+              "id": "b48ea2ee-be3e-49bf-927e-1c6ec0d38094",
+              "name": "body",
+              "value": "=Dear {{ $('Candidate Application Intake').item.json.body.name }}, thank you for your patience during our HR review...",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        576,
+        240
+      ],
+      "id": "ca1cc7ca-6af9-446c-8916-56b831eb61c6",
+      "name": "Send Manual Rejection Email"
+    },
+    {
+      "parameters": {
+        "sendTo": "abdulsubhantanoli1@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        -80
+      ],
+      "id": "2d847309-e956-471e-8192-4d076faf3531",
+      "name": "Send a message",
+      "webhookId": "5af7ddf5-ee45-4857-8caa-08aef0ca2cba",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Nx0hK6edETQzy7ov",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "abdulsubhantanoli1@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        64,
+        384
+      ],
+      "id": "f04e8094-d89f-48a3-961e-62e9852eaf0a",
+      "name": "Send a message1",
+      "webhookId": "96bb0b6b-706d-4b3e-81db-20feef08f1f8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Nx0hK6edETQzy7ov",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Candidate Application Intake": {
+      "main": [
+        [
+          {
+            "node": "Validate Application Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Application Payload": {
+      "main": [
+        [
+          {
+            "node": "Log Raw Application",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Raw Application": {
+      "main": [
+        [
+          {
+            "node": "Respond 200 OK",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Resume Assessor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Resume Assessor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Resume Assessor",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Resume Assessor": {
+      "main": [
+        [
+          {
+            "node": "Update DB with AI Assessment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update DB with AI Assessment": {
+      "main": [
+        [
+          {
+            "node": "Check Fit Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond 200 OK": {
+      "main": [
+        []
+      ]
+    },
+    "Check Fit Score": {
+      "main": [
+        [
+          {
+            "node": "Wait for Recruiter Review",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update DB (Auto-Rejected)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update DB (Auto-Rejected)": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Recruiter Review": {
+      "main": [
+        [
+          {
+            "node": "Check Recruiter Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Recruiter Decision": {
+      "main": [
+        [
+          {
+            "node": "Update DB (Shortlisted)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update DB (Shortlisted)": {
+      "main": [
+        [
+          {
+            "node": "Send Email to shortlisted candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Send Manual Rejection Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email to shortlisted candidates": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "6011e9d4-950b-4554-8cc9-7a316703ef38",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "kN5tV62sTuS7Ewkp",
+  "tags": []
+}
