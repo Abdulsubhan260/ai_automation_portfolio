@@ -1,0 +1,1343 @@
+{
+  "name": "capstone project internship task (3)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-intake",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2144,
+        -64
+      ],
+      "id": "7cf884e0-170c-46d6-8692-a3a958d2987f",
+      "name": "Lead Intake",
+      "webhookId": "da9f31b3-1d8a-4b40-be3e-3ab86cce5355"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cfb3eaca-3485-47a8-a3bf-56e759f33bef",
+              "leftValue": "={{ $json.body.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "ce0fe65d-1631-432c-86c0-b64da923c294",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b0503dcc-ad6f-411f-a55a-85116d965307",
+              "leftValue": "={{ $json.body.company }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "8ef97565-2ca1-46cd-b7b7-f91a8fe6f5f4",
+              "leftValue": "={{ $json.body.budget.toString() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1968,
+        -64
+      ],
+      "id": "069ea4fd-5d7d-4b2d-a8f5-72e2de0cb477",
+      "name": "Validate Lead Payload"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.agify.io/?name={{ $('Lead Intake').item.json.body.name.split(' ')[0] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -1696,
+        -304
+      ],
+      "id": "21fb7d85-0882-4ec5-b6cf-bb9279475680",
+      "name": "Enrich Lead Age"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "leads",
+          "mode": "list",
+          "cachedResultName": "leads"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "lead_score": 0,
+            "name": "={{ $('Lead Intake').item.json.body.name }}",
+            "email": "={{ $('Lead Intake').item.json.body.email }}",
+            "company": "={{ $('Lead Intake').item.json.body.company }}",
+            "budget": "={{ $('Lead Intake').item.json.body.budget }}\n",
+            "enriched_age": "={{ $json.age }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "lead_id",
+              "displayName": "lead_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "budget",
+              "displayName": "budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "enriched_age",
+              "displayName": "enriched_age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lead_score",
+              "displayName": "lead_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "buying_intent",
+              "displayName": "buying_intent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -1552,
+        -304
+      ],
+      "id": "a0dd231d-119d-4f3f-bcba-1733ded89041",
+      "name": "Log Raw Lead",
+      "credentials": {
+        "postgres": {
+          "id": "pbD6epjkkkKbLjRg",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"success\",\n  \"message\": \"Lead received, enriched, and successfully logged.\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -1328,
+        -128
+      ],
+      "id": "90d1bc6a-c9c8-48ea-8860-60a3b1e2a093",
+      "name": "Respond 200 Ok"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an advanced B2B Sales Qualification AI. Your task is to analyze the lead's company, budget, and requested service to assess their buying intent, calculate a qualification score, and determine if they are qualified.\n\nLead Name: {{ $('Lead Intake').item.json.body.name }}\nCompany Name: {{ $('Lead Intake').item.json.body.company }}\nRequested Service: {{ $('Lead Intake').item.json.body.service }}\nEstimated Budget: ${{ $('Lead Intake').item.json.body.budget }}\nPredicted Age: {{ $('Enrich Lead Age').item.json.age }} years old\n\nCalculate a qualification score from 0 to 100. Our target B2B enterprise clients typically request high-value services (like AI, Automation, or Enterprise) and have budgets over $5,000. If their lead score is 80 or above, set \"qualified\" to true. Otherwise, set it to false. Provide a concise 1-2 sentence fit reason.",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -1264,
+        -304
+      ],
+      "id": "57350012-4f02-4091-bbf7-af07721985d9",
+      "name": "AI Lead Assessor"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -1056,
+        -32
+      ],
+      "id": "d2ddb356-5122-420d-8d5a-2dbe943e9250",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"lead_score\": 85,\n  \"buying_intent\": \"High\",\n  \"fit_reason\": \"The lead has an enterprise-level budget of $15,000 and is requesting our high-demand Custom AI Automation service.\",\n  \"qualified\": true\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -912,
+        -48
+      ],
+      "id": "45036802-1e07-4b8d-aeda-df21b2bfcd99",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -1040,
+        144
+      ],
+      "id": "6c76af08-04da-489f-9ae4-32f617449818",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "leads",
+          "mode": "list",
+          "cachedResultName": "leads"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "budget": 0,
+            "enriched_age": 0,
+            "lead_id": "={{ $('Log Raw Lead').item.json.lead_id }}",
+            "lead_score": "={{ $('AI Lead Assessor').item.json.output.lead_score }}",
+            "buying_intent": "={{ $('AI Lead Assessor').item.json.output.buying_intent }}",
+            "status": "Triage Completed"
+          },
+          "matchingColumns": [
+            "lead_id"
+          ],
+          "schema": [
+            {
+              "id": "lead_id",
+              "displayName": "lead_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "budget",
+              "displayName": "budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "enriched_age",
+              "displayName": "enriched_age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lead_score",
+              "displayName": "lead_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "buying_intent",
+              "displayName": "buying_intent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -928,
+        -304
+      ],
+      "id": "6754d091-d31e-4afb-a596-a820066e1813",
+      "name": "Update DB with AI Assessment",
+      "credentials": {
+        "postgres": {
+          "id": "pbD6epjkkkKbLjRg",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bc24b0b1-eda7-45eb-8d76-3ce33d67676c",
+              "leftValue": "={{ $('AI Lead Assessor').item.json.output.qualified }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -704,
+        -304
+      ],
+      "id": "8830f08d-a286-4d73-b4bb-9cb11045dbde",
+      "name": "Check Lead Qualification"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "leads",
+          "mode": "list",
+          "cachedResultName": "leads"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "budget": 0,
+            "enriched_age": 0,
+            "lead_score": 0,
+            "lead_id": "={{ $('Log Raw Lead').item.json.lead_id }}",
+            "status": "Added to Nurture"
+          },
+          "matchingColumns": [
+            "lead_id"
+          ],
+          "schema": [
+            {
+              "id": "lead_id",
+              "displayName": "lead_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "budget",
+              "displayName": "budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "enriched_age",
+              "displayName": "enriched_age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lead_score",
+              "displayName": "lead_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "buying_intent",
+              "displayName": "buying_intent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -480,
+        -80
+      ],
+      "id": "fa99962e-8a3b-444a-842a-4e03262ddb65",
+      "name": "Update DB (Nurture List)",
+      "credentials": {
+        "postgres": {
+          "id": "pbD6epjkkkKbLjRg",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c716d44d-3717-45a4-93e7-b87360e6622b",
+              "name": "email_to",
+              "value": "={{ $('Lead Intake').item.json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "9f81391c-0b90-43cb-b694-5115f6ed3417",
+              "name": "subject",
+              "value": "=Resources & Insights - Petalnex",
+              "type": "string"
+            },
+            {
+              "id": "acf560a7-f29a-4073-a332-e015174d4196",
+              "name": "body",
+              "value": "=Dear {{ $('Lead Intake').item.json.body.name }}, thank you for your interest in our services. Here are some of our latest B2B case studies and free operational guides to help you scale.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -288,
+        -80
+      ],
+      "id": "59d08f76-2dd2-4783-86d6-20db0726f5cd",
+      "name": "Send Nurture Email"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "options": {
+          "webhookSuffix": "sales-decision"
+        }
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        -400
+      ],
+      "id": "c6d48c88-43b6-43ab-8991-ebf5c87f9db5",
+      "name": "Wait",
+      "webhookId": "406bf2c0-9b10-48d4-afc2-40519ce67c16"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9a9ab4c4-300f-4010-92e5-624ece9c1b08",
+              "leftValue": "={{ $json.query.decision }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -256,
+        -400
+      ],
+      "id": "39e662c2-5e4a-4fa7-bc5c-87f45b7a7222",
+      "name": "Check Sales Decision"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "leads",
+          "mode": "list",
+          "cachedResultName": "leads"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "budget": 0,
+            "enriched_age": 0,
+            "lead_score": 0,
+            "lead_id": "={{ $('Log Raw Lead').item.json.lead_id }}",
+            "status": "Approved - Sales Alerted"
+          },
+          "matchingColumns": [
+            "lead_id"
+          ],
+          "schema": [
+            {
+              "id": "lead_id",
+              "displayName": "lead_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "budget",
+              "displayName": "budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "enriched_age",
+              "displayName": "enriched_age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lead_score",
+              "displayName": "lead_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "buying_intent",
+              "displayName": "buying_intent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -32,
+        -496
+      ],
+      "id": "3c08c466-fb99-4da1-99fd-7ff67b74794b",
+      "name": "Update DB (Sales Alerted)",
+      "credentials": {
+        "postgres": {
+          "id": "pbD6epjkkkKbLjRg",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "75aa067f-3965-4041-b248-27c1b5ccde4a",
+              "name": "email_to",
+              "value": "={{ $('Lead Intake').item.json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "d0fc7c45-a399-4f64-b3a5-6654eeba5a26",
+              "name": "subject",
+              "value": "Let's Schedule a Discovery Call - Petalnex",
+              "type": "string"
+            },
+            {
+              "id": "0dfe9075-2c2a-4cda-b1db-760af3481054",
+              "name": "body",
+              "value": "=Dear {{ $('Lead Intake').item.json.body.name }}, congratulations! Your inquiry has been fast-tracked. Our sales lead has reviewed your B2B criteria (Fit Score: {{ $('AI Lead Assessor').item.json.output.lead_score }}/100) and would love to schedule a discovery call. Please book a slot here: https://calendly.com/petalnex-sales",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        192,
+        -496
+      ],
+      "id": "42f72c64-c48d-47b2-8dd7-a015b5cf1961",
+      "name": "Send Sales Booking Email"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "leads",
+          "mode": "list",
+          "cachedResultName": "leads"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "budget": 0,
+            "enriched_age": 0,
+            "lead_score": 0,
+            "lead_id": "={{ $('Log Raw Lead').item.json.lead_id }}",
+            "status": "Rejected by Sales"
+          },
+          "matchingColumns": [
+            "lead_id"
+          ],
+          "schema": [
+            {
+              "id": "lead_id",
+              "displayName": "lead_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "budget",
+              "displayName": "budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "enriched_age",
+              "displayName": "enriched_age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lead_score",
+              "displayName": "lead_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "buying_intent",
+              "displayName": "buying_intent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -32,
+        -304
+      ],
+      "id": "9ab930bb-1bce-4d5f-a6fc-5dde9622b6ec",
+      "name": "Update DB (Sales Rejected)",
+      "credentials": {
+        "postgres": {
+          "id": "pbD6epjkkkKbLjRg",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ac6b8f02-86c3-473b-8dad-496d91ed8183",
+              "name": "email_to",
+              "value": "={{ $('Lead Intake').item.json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "0cf10856-3249-4144-908b-693ba83feba9",
+              "name": "subject",
+              "value": "Inquiry Status - Petalnex",
+              "type": "string"
+            },
+            {
+              "id": "6ae9f58b-7d1a-452b-a6a8-59cb1e32de54",
+              "name": "body",
+              "value": "=Dear {{ $('Lead Intake').item.json.body.name }}, thank you for your patience during our team's B2B review...",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        192,
+        -304
+      ],
+      "id": "11ef4f9c-89a8-4074-8334-0f6336a061c4",
+      "name": "Send Fallback Nurture Email"
+    },
+    {
+      "parameters": {
+        "sendTo": "abdulsubhantanoli1@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -64,
+        -80
+      ],
+      "id": "d0595e31-c6be-46a4-9643-e87339ccc632",
+      "name": "Send a message",
+      "webhookId": "b08588ac-8fb2-4ec4-9f64-8393e12cd1d4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Nx0hK6edETQzy7ov",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "abdulsubhantanoli1@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        -496
+      ],
+      "id": "342e7107-515b-4eb4-8f9f-c4befc7b7b17",
+      "name": "Send a message1",
+      "webhookId": "bdc4ca3d-fb15-41e9-8a2e-ec38e1fd6acc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Nx0hK6edETQzy7ov",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Lead Intake": {
+      "main": [
+        [
+          {
+            "node": "Validate Lead Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Lead Payload": {
+      "main": [
+        [
+          {
+            "node": "Enrich Lead Age",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Enrich Lead Age": {
+      "main": [
+        [
+          {
+            "node": "Log Raw Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Raw Lead": {
+      "main": [
+        [
+          {
+            "node": "Respond 200 Ok",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Lead Assessor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Lead Assessor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Lead Assessor",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Lead Assessor": {
+      "main": [
+        [
+          {
+            "node": "Update DB with AI Assessment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update DB with AI Assessment": {
+      "main": [
+        [
+          {
+            "node": "Check Lead Qualification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Lead Qualification": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update DB (Nurture List)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update DB (Nurture List)": {
+      "main": [
+        [
+          {
+            "node": "Send Nurture Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Check Sales Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Sales Decision": {
+      "main": [
+        [
+          {
+            "node": "Update DB (Sales Alerted)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update DB (Sales Rejected)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update DB (Sales Alerted)": {
+      "main": [
+        [
+          {
+            "node": "Send Sales Booking Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update DB (Sales Rejected)": {
+      "main": [
+        [
+          {
+            "node": "Send Fallback Nurture Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Nurture Email": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Sales Booking Email": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "2651fc25-9209-4da8-aaac-e836eda5bbcc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "siZ8Mhz3WNjvjky6",
+  "tags": []
+}
