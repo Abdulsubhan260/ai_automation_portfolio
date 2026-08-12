@@ -1,0 +1,769 @@
+
+{
+  "name": "project 5 (AI complain Management system)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "complaint-intake",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1264,
+        144
+      ],
+      "id": "f7ad7735-c1c7-4264-87a8-993c8c5db43b",
+      "name": "Complaint Intake",
+      "webhookId": "c5a01354-ffb5-4789-917f-cbf2bd5c92bb"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8ebc7b2a-33a7-4877-8628-ac6fe51f91f7",
+              "leftValue": "={{ $json.body.customer_name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "a2c1fd08-5c94-45a4-a101-d12c2170a26d",
+              "leftValue": "={{ $json.body.email }}  →",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "460f2c24-a633-4a64-87b4-b60034c77178",
+              "leftValue": "={{ $json.body.email.complaint_text }}  →",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1072,
+        144
+      ],
+      "id": "d5bb7944-9b99-4eb0-937c-197b7bdc5f5c",
+      "name": "Validate Complaint Payload"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "complaints(P4)",
+        "fields": "={\n  \"customer_name\": \"={{ $('Complaint Intake').item.json.body.customer_name }}\",\n  \"email\": \"={{ $('Complaint Intake').item.json.body.email }}\",\n  \"order_id\": \"={{ $('Complaint Intake').item.json.body.order_id || 'N/A' }}\",\n  \"complaint_text\": \"={{ $('Complaint Intake').item.json.body.complaint_text }}\",\n  \"status\": \"New\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.4,
+      "position": [
+        -800,
+        -144
+      ],
+      "id": "636b20c5-d06b-4fcd-8b2a-477f4d0e16ae",
+      "name": "Create Complaint Case",
+      "credentials": {
+        "mongoDb": {
+          "id": "2TwFFVHboYN9TNMG",
+          "name": "MongoDB account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"ticket_id\": \"=TCK-{{ $json._id }}\",\n  \"message\": \"Your complaint has been successfully registered. Please use your ticket ID to track its status.\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -816,
+        368
+      ],
+      "id": "e0794337-44ae-4c88-b873-dfca673eafc4",
+      "name": "Respond 200 OK with Ticket"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an advanced Customer Complaint Resolution AI. Analyze the customer's complaint below to extract the required triage metrics.\n\nCustomer Name: {{ $('Complaint Intake').item.json.body.customer_name }}\nComplaint Text:\n{{ $('Complaint Intake').item.json.body.complaint_text }}\n\nRULES:\n1. Determine the category (e.g., Billing Issue, Delivery Delay, Product Damage, Customer Service).\n2. Assess priority (Critical, High, Medium, Low).\n3. Evaluate sentiment (Anger, Frustrated, Neutral).\n4. Flag \"legal_risk\" as true ONLY if the customer explicitly mentions suing, lawyers, regulatory bodies, or taking legal action. Otherwise, false.\n5. Write a 1-sentence executive recommendation on how to resolve this.",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -608,
+        368
+      ],
+      "id": "3097fe81-b200-448c-9fbf-2659c79d15ae",
+      "name": "AI Complaint Triage"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        624
+      ],
+      "id": "b3cee405-8ed4-4ecd-b6bb-05062b554a37",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"category\": \"Billing Issue\",\n  \"priority\": \"High\",\n  \"sentiment\": \"Frustrated\",\n  \"legal_risk\": false,\n  \"summary\": \"Customer was double charged for their monthly subscription.\",\n  \"executive_recommendation\": \"Process an immediate refund for the duplicate charge to prevent churn.\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -464,
+        528
+      ],
+      "id": "7f205a53-7455-486d-8b0e-35b7cda6d7a7",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        736
+      ],
+      "id": "df8b9359-a904-46af-8e9b-ca9153ac2784",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "db506efa-89dc-4cf7-8d5a-c686edede500",
+              "leftValue": "={{ $('AI Complaint Triage').item.json.output.legal_risk }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "bd1bc1be-ec39-4a9b-bbc5-54fda2849248",
+              "leftValue": "={{ $('AI Complaint Triage').item.json.output.priority }}",
+              "rightValue": "Critical",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -256,
+        368
+      ],
+      "id": "ced7a556-3461-42c8-98e9-365b299cdf03",
+      "name": "Check Critical / Legal Risk"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "options": {
+          "webhookSuffix": "manager-decision"
+        }
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        16
+      ],
+      "id": "b0231c1e-1e13-413f-951b-b80796b8f175",
+      "name": "Wait for Manager Review",
+      "webhookId": "d727979f-afaa-4a0b-be0c-01a7eda8d140"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6b70fe9e-8368-4eaa-8247-ba406420c626",
+              "leftValue": "={{ $json.query.decision }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        16
+      ],
+      "id": "bf5a1c71-2c2e-4e4b-853d-a336aac46f4d",
+      "name": "Check Manager Decision"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "complaints(P4)",
+        "updateKey": "_id",
+        "fields": "category,priority,sentiment,legal_risk,management_notes,status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.4,
+      "position": [
+        176,
+        496
+      ],
+      "id": "bccb2d06-2484-427a-8a7b-c82161e0e16e",
+      "name": "Update Case (Triage Complete)",
+      "credentials": {
+        "mongoDb": {
+          "id": "2TwFFVHboYN9TNMG",
+          "name": "MongoDB account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('AI Complaint Triage').item.json.output.category.toLowerCase() }}",
+                    "rightValue": "billing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "e6bfd03c-79e8-4954-84ed-f9598945b9b7"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Billing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5ab5f56d-7a1f-455f-98cd-37574e27620d",
+                    "leftValue": "={{ $('AI Complaint Triage').item.json.output.category.toLowerCase() }}",
+                    "rightValue": "delivery",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Delivery"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d00845b7-07f7-4b26-8081-e1a9b528dd6a",
+                    "leftValue": "={{ $('AI Complaint Triage').item.json.output.category.toLowerCase() }}",
+                    "rightValue": "product",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Products"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a9d6a0ad-51e9-4c63-b8a7-dd00334668a1",
+                    "leftValue": "={{ $('AI Complaint Triage').item.json.output.category.toLowerCase() }}",
+                    "rightValue": "service",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Service"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        384,
+        464
+      ],
+      "id": "f626b0f2-2fef-4f53-bb2f-7937a49684d9",
+      "name": "Route by Department"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "330d67ba-5759-4f79-a576-19c0db012d33",
+              "name": "notify_email",
+              "value": "finance@company.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1072,
+        128
+      ],
+      "id": "96248d01-7aeb-49ee-92c2-b083b0c496c5",
+      "name": "Alert Finance Team"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cb226bdc-3534-4577-9c6f-50e3e77a2d58",
+              "name": "alert_email",
+              "value": "shippingdept@company.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1040,
+        336
+      ],
+      "id": "3451f79d-eec7-4f4c-9500-d9d4db3b3cc6",
+      "name": "Alert Logistics Team"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "428bde58-3fbf-4006-9f4d-b808e5d74bc5",
+              "name": "notify_email",
+              "value": "qcdept@comapny.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1072,
+        656
+      ],
+      "id": "1c4e0e29-2381-46f9-9587-26a19681aa94",
+      "name": "Alert Quality Control"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9c197abe-8e47-4478-94c2-31d7d9b8c44f",
+              "name": "Alert Customer Support",
+              "value": "customer_support@company.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        912,
+        784
+      ],
+      "id": "6d390c00-43a1-4af8-b0b1-0223e8d94784",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5a9c7451-7ed8-4681-851d-f984511eef64",
+              "name": "_id",
+              "value": "={{ $('Create Complaint Case').item.json._id }}",
+              "type": "string"
+            },
+            {
+              "id": "7167b7a3-7969-466d-ac9d-6de878ffee6d",
+              "name": "category",
+              "value": "={{ $('AI Complaint Triage').item.json.output.category }}",
+              "type": "string"
+            },
+            {
+              "id": "c1a49b0a-0427-4cf1-8f07-980e7fab5441",
+              "name": "priority",
+              "value": "={{ $('AI Complaint Triage').item.json.output.priority }}",
+              "type": "string"
+            },
+            {
+              "id": "91dd1251-7bb6-4a10-b88c-8b80a8884a87",
+              "name": "sentiment",
+              "value": "={{ $('AI Complaint Triage').item.json.output.sentiment }}",
+              "type": "string"
+            },
+            {
+              "id": "32292334-e52a-4eaa-9787-5361524520ed",
+              "name": "legal_risk",
+              "value": "={{ $('AI Complaint Triage').item.json.output.legal_risk }}",
+              "type": "string"
+            },
+            {
+              "id": "5468b2fa-d913-48a4-b904-26229eebc4bc",
+              "name": "management_notes",
+              "value": "={{ $('AI Complaint Triage').item.json.output.executive_recommendation }}",
+              "type": "string"
+            },
+            {
+              "id": "4745c9d6-d4fb-4a44-9620-a0c8f1416ebe",
+              "name": "status",
+              "value": "Triage Completed",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        80
+      ],
+      "id": "f761b631-1088-4fe0-a0a9-3d0c38cd1f9c",
+      "name": "Re-attach Ticket ID"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Complaint Intake": {
+      "main": [
+        [
+          {
+            "node": "Validate Complaint Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Complaint Payload": {
+      "main": [
+        [
+          {
+            "node": "Create Complaint Case",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Complaint Case": {
+      "main": [
+        [
+          {
+            "node": "Respond 200 OK with Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond 200 OK with Ticket": {
+      "main": [
+        [
+          {
+            "node": "AI Complaint Triage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Complaint Triage",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Complaint Triage",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Complaint Triage": {
+      "main": [
+        [
+          {
+            "node": "Check Critical / Legal Risk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Critical / Legal Risk": {
+      "main": [
+        [
+          {
+            "node": "Wait for Manager Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Manager Review": {
+      "main": [
+        [
+          {
+            "node": "Check Manager Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Manager Decision": {
+      "main": [
+        [
+          {
+            "node": "Re-attach Ticket ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Re-attach Ticket ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Case (Triage Complete)": {
+      "main": [
+        [
+          {
+            "node": "Route by Department",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Department": {
+      "main": [
+        [
+          {
+            "node": "Alert Finance Team",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Alert Logistics Team",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Alert Quality Control",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Re-attach Ticket ID": {
+      "main": [
+        [
+          {
+            "node": "Update Case (Triage Complete)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0ccdbf20-635c-4e0e-8704-390984868c46",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "RzdYjeluFNHaIRzc",
+  "tags": []
+}
