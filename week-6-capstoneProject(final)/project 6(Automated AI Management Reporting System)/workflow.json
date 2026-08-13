@@ -1,0 +1,276 @@
+{
+  "name": "project 6(Automated AI Management Reporting )",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1184,
+        -160
+      ],
+      "id": "98de7944-ff0a-4f1c-8345-98067f96a1ef",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      \"week_start\": \"2026-08-10\",\n      \"daily_stats\": [\n        { \"day\": \"Monday\", \"sales_revenue\": 4500, \"support_tickets\": 12, \"server_uptime\": 100 },\n        { \"day\": \"Tuesday\", \"sales_revenue\": 5200, \"support_tickets\": 15, \"server_uptime\": 100 },\n        { \"day\": \"Wednesday\", \"sales_revenue\": 1100, \"support_tickets\": 85, \"server_uptime\": 96.5 },\n        { \"day\": \"Thursday\", \"sales_revenue\": 4800, \"support_tickets\": 20, \"server_uptime\": 100 },\n        { \"day\": \"Friday\", \"sales_revenue\": 6100, \"support_tickets\": 10, \"server_uptime\": 100 }\n      ]\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1008,
+        -160
+      ],
+      "id": "23f5fa03-26c1-4429-bbb3-6f3763fb38e5",
+      "name": "Fetch Weekly Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst stats = data.daily_stats;\n\n// Calculate totals and averages\nlet totalRevenue = 0;\nlet totalTickets = 0;\nlet totalUptime = 0;\n\nstats.forEach(day => {\n    totalRevenue += day.sales_revenue;\n    totalTickets += day.support_tickets;\n    totalUptime += day.server_uptime;\n});\n\nconst averageUptime = (totalUptime / stats.length).toFixed(2);\n\nreturn {\n    json: {\n        week_start: data.week_start,\n        total_weekly_revenue: totalRevenue,\n        total_weekly_tickets: totalTickets,\n        average_uptime_percent: averageUptime,\n        raw_daily_breakdown: stats\n    }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -848,
+        -160
+      ],
+      "id": "b079b3d3-7e27-482e-974e-c0bd04d875ca",
+      "name": "Calculate Weekly Metrics"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        32
+      ],
+      "id": "1058c514-0859-4e5b-b2ee-21e4135a9f80",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert Executive Business Analyst. Review the weekly performance metrics below and generate a management report. \n\nWEEKLY TOTALS:\n- Total Revenue: ${{ $json.total_weekly_revenue }}\n- Total Support Tickets: {{ $json.total_weekly_tickets }}\n- Average Uptime: {{ $json.average_uptime_percent }}%\n\nDAILY BREAKDOWN:\n{{ JSON.stringify($json.raw_daily_breakdown) }}\n\nTASK:\n1. Write a brief executive summary of the week's performance.\n2. Identify any major risks, anomalies, or insights (pay close attention to the daily breakdown).\n3. Provide 2-3 strategic recommendations for the management team.",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -624,
+        -160
+      ],
+      "id": "6f89c712-6845-409c-8ae1-7639d1364f74",
+      "name": "AI Business Analyst"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"executive_summary\": \"A 2-3 sentence overview of the week's financial and operational performance.\",\n  \"risks_and_insights\": [\n    \"Insight 1 (e.g., noting specific anomalies or drops in performance)\",\n    \"Insight 2\"\n  ],\n  \"recommendations\": [\n    \"Recommendation 1\",\n    \"Recommendation 2\"\n  ]\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -496,
+        48
+      ],
+      "id": "3eba3d88-6abc-4f48-97ac-92776f51f603",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -672,
+        144
+      ],
+      "id": "055025de-f7de-407e-9b06-cc870927b7d0",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "EtL5K1Bq4Zjap7qZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "be614fad-9ec9-49ed-b14a-76b8922cb22b",
+              "name": "send_to",
+              "value": "management@company.com",
+              "type": "string"
+            },
+            {
+              "id": "1e60233f-c7f6-4b6e-b176-ef5c8c3e85e2",
+              "name": "subject",
+              "value": "=Weekly AI Performance Report - Week of {{ $('Calculate Weekly Metrics').item.json.week_start }}",
+              "type": "string"
+            },
+            {
+              "id": "02cf2458-2dd2-40c7-bce8-29ab01b2ace0",
+              "name": "plain_text_body",
+              "value": "=WEEKLY AI MANAGEMENT REPORT\nWeek Starting: {{ $('Calculate Weekly Metrics').item.json.week_start }}\n\n KEY METRICS:\n1- Total Revenue: ${{ $('Calculate Weekly Metrics').item.json.total_weekly_revenue }}\n2- Total Support Tickets: {{ $('Calculate Weekly Metrics').item.json.total_weekly_tickets }}\n3- Average Uptime: {{ $('Calculate Weekly Metrics').item.json.average_uptime_percent }}%\n\n AI EXECUTIVE SUMMARY:\n{{ $json.output.executive_summary }}\n\n RISKS & INSIGHTS:\n{{ $json.output.risks_and_insights.map(risk => `• ${risk}`).join('\\n') }}\n\nSTRATEGIC RECOMMENDATIONS:\n{{ $json.output.recommendations.map(rec => `• ${rec}`).join('\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -256,
+        -160
+      ],
+      "id": "576942d2-646f-43fd-be5f-4b8d71fc42d2",
+      "name": "Generate Executive Email"
+    },
+    {
+      "parameters": {
+        "sendTo": "abdulsubhantanoli1@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.plain_text_body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -32,
+        -160
+      ],
+      "id": "614152f4-5b1e-4578-b674-c9abca0c356f",
+      "name": "Send a message",
+      "webhookId": "afcc5906-1663-4e25-be89-66d5b7bebfca",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Nx0hK6edETQzy7ov",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Fetch Weekly Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Weekly Data": {
+      "main": [
+        [
+          {
+            "node": "Calculate Weekly Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Weekly Metrics": {
+      "main": [
+        [
+          {
+            "node": "AI Business Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Business Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Business Analyst",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Business Analyst": {
+      "main": [
+        [
+          {
+            "node": "Generate Executive Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Executive Email": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "d74078c5-001f-4146-a06c-fa15b536528a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0c3ddfb019f06098a1c1f484921929babc06727ab4b108782030beed559e206f"
+  },
+  "nodeGroups": [],
+  "id": "rFIMzEfDt66BXssD",
+  "tags": []
+}
