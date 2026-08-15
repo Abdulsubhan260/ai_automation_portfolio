@@ -6,7 +6,7 @@ This repository contains all 30 daily tasks across Weeks 1 to 5, as well as **al
 
 ---
 
-## 🏆 Week 6: Final Capstone Projects (All 6 Options Built)
+##  Week 6: Final Capstone Projects (All 6 Options Built)
 
 I have fully engineered and deployed all 6 Capstone Project options specified in the internship curriculum:
 
@@ -25,9 +25,9 @@ I have fully engineered and deployed all 6 Capstone Project options specified in
 
 ---
 
-## 📅 Complete 30-Day Internship Roadmap (Weeks 1 to 5)
+##  Complete 30-Day Internship Roadmap (Weeks 1 to 5)
 
-### 📅 Week 1: Automation Foundations & n8n Core
+###  Week 1: Automation Foundations & n8n Core
 *   [Day 1: Onboarding & BPA Opportunities Audit](./Week-1-Foundations/week%201%20day%201)
 *   [Day 2: Scheduled Daily Reminder Workflow](./Week-1-Foundations/week%201%20day%202/workflow.json)
 *   [Day 3: JSON Data Shaping & Classification](./Week-1-Foundations/week%201%20day%203/workflow.json)
@@ -43,7 +43,7 @@ I have fully engineered and deployed all 6 Capstone Project options specified in
 *   [Day 11: Multi-System Enrichment Integration](./Week-2-APIs-and-Integration/week%202%20day%205/workflow.json)
 *   [Day 12 (Assignment 2): Automated Lead Management System](./Week-2-APIs-and-Integration/week%202%20day%206/workflow.json)
 
-### 📅 Week 3: Generative AI, LLMs & Prompt Engineering
+###  Week 3: Generative AI, LLMs & Prompt Engineering
 *   [Day 13: LLM Provider Manual Postman Evaluations](./Week-3-Generative-AI-Prompting/week%203%20day%201)
 *   [Day 14: Prompt Engineering & Structured JSON Prompts](./Week-3-Generative-AI-Prompting/week%203%20day%202)
 *   [Day 15: LLM Categorizer Chain](./Week-3-Generative-AI-Prompting/week3%20day%203/workflow.json)
@@ -51,7 +51,7 @@ I have fully engineered and deployed all 6 Capstone Project options specified in
 *   [Day 17: Provider Comparison & Benchmark Evaluation Report](./Week-3-Generative-AI-Prompting/week%203%20day%205)
 *   [Day 18 (Assignment 3): AI Customer Support Triage System](./Week-3-Generative-AI-Prompting/week%203%20day%206/workflow.json)
 
-### 📅 Week 4: RAG, Vector Databases & AI Agents
+###  Week 4: RAG, Vector Databases & AI Agents
 *   [Day 19: RAG Architecture & Fundamentals](./Week-4-RAG-and-AI-Agents/week%204%20day%201/RAG-Explained.pdf)
 *   [Day 20: Document Ingestion & Embeddings Pipeline](./Week-4-RAG-and-AI-Agents/week%204%20day%202/workflow.json)
 *   [Day 21: RAG Policy Assistant](./Week-4-RAG-and-AI-Agents/week%204%20day%203/workflow.json)
@@ -59,7 +59,7 @@ I have fully engineered and deployed all 6 Capstone Project options specified in
 *   [Day 23: Multi-Tool Agent with Human Safeguards](./Week-4-RAG-and-AI-Agents/week%204%20day%205/workflow.json)
 *   [Day 24 (Assignment 4): Company Knowledge AI Assistant (Pinecone + HF)](./Week-4-RAG-and-AI-Agents/week%204%20day%206/workflow.json)
 
-### 📅 Week 5: Databases, Security, and Production-Grade Workflows
+###  Week 5: Databases, Security, and Production-Grade Workflows
 *   [Day 25: Relational Postgres Database CRUD (Supabase)](./Week-5-Production-and-Databases/week5%20day%201/workflow.json)
 *   [Day 26: Resilient Error Handling & Node Retries](./Week-5-Production-and-Databases/week%205%20day%202/workflow.json)
 *   [Day 27: Webhook Endpoint Header Security (`x-secret-token`)](./Week-5-Production-and-Databases/week%205%20day%203/workflow.json)
@@ -69,7 +69,7 @@ I have fully engineered and deployed all 6 Capstone Project options specified in
 
 ---
 
-## 🛠️ Technology Stack & Integrations
+##  Technology Stack & Integrations
 * **Automation Platform:** n8n (Self-Hosted on Localhost)
 * **AI Models & Inference:** Groq (Llama 3.1 8B) & Google Gemini
 * **Vector Databases & Embeddings:** Pinecone Vector Store & Hugging Face (`all-MiniLM-L6-v2`)
